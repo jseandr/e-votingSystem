@@ -14,12 +14,5 @@ service cloud.firestore {
       allow write: if false;
       allow delete: if resource.data.img_owner == /databases/$(database)/documents/Users/$(request.auth.uid);
     }
-
-    match /repsList/{document} {
-      allow create: if true;
-      allow read: if true;
-      allow write: if true;
-      allow delete: if true;
-    }
   }
 }

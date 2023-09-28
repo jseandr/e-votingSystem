@@ -185,7 +185,16 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed('adminHome');
+                                context.goNamed(
+                                  'adminHome',
+                                  extra: <String, dynamic>{
+                                    kTransitionInfoKey: TransitionInfo(
+                                      hasTransition: true,
+                                      transitionType: PageTransitionType.fade,
+                                      duration: Duration(milliseconds: 0),
+                                    ),
+                                  },
+                                );
                               },
                               child: Container(
                                 width: double.infinity,
@@ -243,7 +252,16 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed('adminInsert');
+                                context.goNamed(
+                                  'adminInsert',
+                                  extra: <String, dynamic>{
+                                    kTransitionInfoKey: TransitionInfo(
+                                      hasTransition: true,
+                                      transitionType: PageTransitionType.fade,
+                                      duration: Duration(milliseconds: 0),
+                                    ),
+                                  },
+                                );
                               },
                               child: Container(
                                 width: double.infinity,
@@ -294,7 +312,16 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed('adminList');
+                                context.goNamed(
+                                  'adminList',
+                                  extra: <String, dynamic>{
+                                    kTransitionInfoKey: TransitionInfo(
+                                      hasTransition: true,
+                                      transitionType: PageTransitionType.fade,
+                                      duration: Duration(milliseconds: 0),
+                                    ),
+                                  },
+                                );
                               },
                               child: Container(
                                 width: double.infinity,
@@ -407,7 +434,16 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed('adminSetting');
+                                context.goNamed(
+                                  'adminSetting',
+                                  extra: <String, dynamic>{
+                                    kTransitionInfoKey: TransitionInfo(
+                                      hasTransition: true,
+                                      transitionType: PageTransitionType.fade,
+                                      duration: Duration(milliseconds: 0),
+                                    ),
+                                  },
+                                );
                               },
                               child: Container(
                                 width: double.infinity,

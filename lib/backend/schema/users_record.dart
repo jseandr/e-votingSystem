@@ -131,20 +131,10 @@ class UsersRecord extends FirestoreRecord {
   bool get isVerified => _isVerified ?? false;
   bool hasIsVerified() => _isVerified != null;
 
-  // "repVoteList" field.
-  List<bool>? _repVoteList;
-  List<bool> get repVoteList => _repVoteList ?? const [];
-  bool hasRepVoteList() => _repVoteList != null;
-
   // "positionListForReps" field.
   List<String>? _positionListForReps;
   List<String> get positionListForReps => _positionListForReps ?? const [];
   bool hasPositionListForReps() => _positionListForReps != null;
-
-  // "repsList" field.
-  DocumentReference? _repsList;
-  DocumentReference? get repsList => _repsList;
-  bool hasRepsList() => _repsList != null;
 
   void _initializeFields() {
     _displayName = snapshotData['display_name'] as String?;
@@ -170,9 +160,7 @@ class UsersRecord extends FirestoreRecord {
     _repVote = snapshotData['repVote'] as bool?;
     _isCandidate = snapshotData['is_candidate'] as bool?;
     _isVerified = snapshotData['is_verified'] as bool?;
-    _repVoteList = getDataList(snapshotData['repVoteList']);
     _positionListForReps = getDataList(snapshotData['positionListForReps']);
-    _repsList = snapshotData['repsList'] as DocumentReference?;
   }
 
   static CollectionReference get collection =>
@@ -232,7 +220,6 @@ Map<String, dynamic> createUsersRecordData({
   bool? repVote,
   bool? isCandidate,
   bool? isVerified,
-  DocumentReference? repsList,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -259,7 +246,6 @@ Map<String, dynamic> createUsersRecordData({
       'repVote': repVote,
       'is_candidate': isCandidate,
       'is_verified': isVerified,
-      'repsList': repsList,
     }.withoutNulls,
   );
 
@@ -295,9 +281,7 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e1?.repVote == e2?.repVote &&
         e1?.isCandidate == e2?.isCandidate &&
         e1?.isVerified == e2?.isVerified &&
-        listEquality.equals(e1?.repVoteList, e2?.repVoteList) &&
-        listEquality.equals(e1?.positionListForReps, e2?.positionListForReps) &&
-        e1?.repsList == e2?.repsList;
+        listEquality.equals(e1?.positionListForReps, e2?.positionListForReps);
   }
 
   @override
@@ -325,9 +309,7 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.repVote,
         e?.isCandidate,
         e?.isVerified,
-        e?.repVoteList,
-        e?.positionListForReps,
-        e?.repsList
+        e?.positionListForReps
       ]);
 
   @override

@@ -15,10 +15,38 @@ class AdminInsertModel extends FlutterFlowModel {
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();
-  // State field(s) for TextField widget.
-  TextEditingController? textController;
-  String? Function(BuildContext, String?)? textControllerValidator;
-  List<UsersRecord> simpleSearchResults = [];
+  // State field(s) for president widget.
+  TextEditingController? presidentController;
+  String? Function(BuildContext, String?)? presidentControllerValidator;
+  List<UsersRecord> simpleSearchResults1 = [];
+  // State field(s) for vicePresident widget.
+  TextEditingController? vicePresidentController;
+  String? Function(BuildContext, String?)? vicePresidentControllerValidator;
+  List<UsersRecord> simpleSearchResults2 = [];
+  // State field(s) for secretary widget.
+  TextEditingController? secretaryController;
+  String? Function(BuildContext, String?)? secretaryControllerValidator;
+  List<UsersRecord> simpleSearchResults3 = [];
+  // State field(s) for treasurer widget.
+  TextEditingController? treasurerController;
+  String? Function(BuildContext, String?)? treasurerControllerValidator;
+  List<UsersRecord> simpleSearchResults4 = [];
+  // State field(s) for auditor widget.
+  TextEditingController? auditorController;
+  String? Function(BuildContext, String?)? auditorControllerValidator;
+  List<UsersRecord> simpleSearchResults5 = [];
+  // State field(s) for businessManager widget.
+  TextEditingController? businessManagerController;
+  String? Function(BuildContext, String?)? businessManagerControllerValidator;
+  List<UsersRecord> simpleSearchResults6 = [];
+  // State field(s) for pio widget.
+  TextEditingController? pioController;
+  String? Function(BuildContext, String?)? pioControllerValidator;
+  List<UsersRecord> simpleSearchResults7 = [];
+  // State field(s) for representative widget.
+  TextEditingController? representativeController;
+  String? Function(BuildContext, String?)? representativeControllerValidator;
+  List<UsersRecord> simpleSearchResults8 = [];
 
   /// Initialization and disposal methods.
 
@@ -26,7 +54,14 @@ class AdminInsertModel extends FlutterFlowModel {
 
   void dispose() {
     unfocusNode.dispose();
-    textController?.dispose();
+    presidentController?.dispose();
+    vicePresidentController?.dispose();
+    secretaryController?.dispose();
+    treasurerController?.dispose();
+    auditorController?.dispose();
+    businessManagerController?.dispose();
+    pioController?.dispose();
+    representativeController?.dispose();
   }
 
   /// Action blocks are added here.
