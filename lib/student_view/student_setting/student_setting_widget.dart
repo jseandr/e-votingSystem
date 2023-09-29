@@ -44,7 +44,9 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
     context.watch<FFAppState>();
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(_model.unfocusNode),
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
@@ -189,7 +191,7 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
                                   'studentHome',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -277,7 +279,7 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
                                   'studentDashboard',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -358,7 +360,7 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
                                   'studentVoting',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -731,17 +733,19 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                       children: [
                                         FFButtonWidget(
                                           onPressed: () async {
-                                            if (currentUserPhoto != '') {
+                                            if (currentUserPhoto == '') {
+                                              await FirebaseStorage.instance
+                                                  .refFromURL(currentUserPhoto)
+                                                  .delete();
+                                            } else {
                                               await FirebaseStorage.instance
                                                   .refFromURL(currentUserPhoto)
                                                   .delete();
                                             }
+
                                             final selectedMedia =
                                                 await selectMediaWithSourceBottomSheet(
                                               context: context,
-                                              maxWidth: 100.00,
-                                              maxHeight: 100.00,
-                                              imageQuality: 70,
                                               allowPhoto: true,
                                             );
                                             if (selectedMedia != null &&
@@ -756,11 +760,6 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
 
                                               var downloadUrls = <String>[];
                                               try {
-                                                showUploadMessage(
-                                                  context,
-                                                  'Uploading file...',
-                                                  showLoading: true,
-                                                );
                                                 selectedUploadedFiles =
                                                     selectedMedia
                                                         .map((m) =>
@@ -794,8 +793,6 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                                         .map((u) => u!)
                                                         .toList();
                                               } finally {
-                                                ScaffoldMessenger.of(context)
-                                                    .hideCurrentSnackBar();
                                                 _model.isDataUploading = false;
                                               }
                                               if (selectedUploadedFiles
@@ -810,12 +807,8 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                                   _model.uploadedFileUrl =
                                                       downloadUrls.first;
                                                 });
-                                                showUploadMessage(
-                                                    context, 'Success!');
                                               } else {
                                                 setState(() {});
-                                                showUploadMessage(context,
-                                                    'Failed to upload data');
                                                 return;
                                               }
                                             }
@@ -1005,44 +998,125 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           0.0, 30.0, 0.0, 0.0),
-                                      child: FFButtonWidget(
-                                        onPressed: () async {
-                                          await currentUserReference!.delete();
-                                          await authManager.deleteUser(context);
-                                          GoRouter.of(context)
-                                              .prepareAuthEvent();
-                                          await authManager.signOut();
-                                          GoRouter.of(context)
-                                              .clearRedirectLocation();
-
-                                          context.goNamedAuth(
-                                              'loginpage', context.mounted);
-                                        },
-                                        text: 'Delete Account',
-                                        options: FFButtonOptions(
-                                          height: 40.0,
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  24.0, 0.0, 24.0, 0.0),
-                                          iconPadding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  0.0, 0.0, 0.0, 0.0),
-                                          color: Color(0xFFFF0000),
-                                          textStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .titleSmall
-                                                  .override(
-                                                    fontFamily: 'Readex Pro',
-                                                    color: Colors.white,
-                                                  ),
-                                          elevation: 3.0,
-                                          borderSide: BorderSide(
-                                            color: Colors.transparent,
-                                            width: 1.0,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
+                                      child: StreamBuilder<List<UsersRecord>>(
+                                        stream: queryUsersRecord(
+                                          singleRecord: true,
                                         ),
+                                        builder: (context, snapshot) {
+                                          // Customize what your widget looks like when it's loading.
+                                          if (!snapshot.hasData) {
+                                            return Center(
+                                              child: SizedBox(
+                                                width: 50.0,
+                                                height: 50.0,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                          Color>(
+                                                    FlutterFlowTheme.of(context)
+                                                        .primary,
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                          List<UsersRecord>
+                                              buttonUsersRecordList =
+                                              snapshot.data!;
+                                          // Return an empty Container when the item does not exist.
+                                          if (snapshot.data!.isEmpty) {
+                                            return Container();
+                                          }
+                                          final buttonUsersRecord =
+                                              buttonUsersRecordList.isNotEmpty
+                                                  ? buttonUsersRecordList.first
+                                                  : null;
+                                          return FFButtonWidget(
+                                            onPressed: () async {
+                                              await showDialog(
+                                                context: context,
+                                                builder: (alertDialogContext) {
+                                                  return AlertDialog(
+                                                    content: Text(
+                                                        'Would you like to delete your account?'),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                                alertDialogContext),
+                                                        child: Text('Ok'),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                              if (buttonUsersRecord
+                                                      ?.readyToVote ==
+                                                  true) {
+                                                await showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (alertDialogContext) {
+                                                    return AlertDialog(
+                                                      content: Text(
+                                                          'You can delete your account after the Voting Phase is done.'),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () =>
+                                                              Navigator.pop(
+                                                                  alertDialogContext),
+                                                          child: Text('Ok'),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              } else {
+                                                await currentUserReference!
+                                                    .delete();
+                                                await authManager
+                                                    .deleteUser(context);
+                                                await Future.delayed(
+                                                    const Duration(
+                                                        milliseconds: 10000));
+                                                GoRouter.of(context)
+                                                    .prepareAuthEvent();
+                                                await authManager.signOut();
+                                                GoRouter.of(context)
+                                                    .clearRedirectLocation();
+                                              }
+
+                                              context.goNamedAuth(
+                                                  'loginpage', context.mounted);
+                                            },
+                                            text: 'Delete Account',
+                                            options: FFButtonOptions(
+                                              height: 40.0,
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(
+                                                      24.0, 0.0, 24.0, 0.0),
+                                              iconPadding: EdgeInsetsDirectional
+                                                  .fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                              color: Color(0xFFFF0000),
+                                              textStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .titleSmall
+                                                      .override(
+                                                        fontFamily:
+                                                            'Readex Pro',
+                                                        color: Colors.white,
+                                                      ),
+                                              elevation: 3.0,
+                                              borderSide: BorderSide(
+                                                color: Colors.transparent,
+                                                width: 1.0,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ),
                                   ]

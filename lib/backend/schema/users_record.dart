@@ -131,10 +131,47 @@ class UsersRecord extends FirestoreRecord {
   bool get isVerified => _isVerified ?? false;
   bool hasIsVerified() => _isVerified != null;
 
-  // "positionListForReps" field.
-  List<String>? _positionListForReps;
-  List<String> get positionListForReps => _positionListForReps ?? const [];
-  bool hasPositionListForReps() => _positionListForReps != null;
+  // "representativesList" field.
+  List<RepsInfoStruct>? _representativesList;
+  List<RepsInfoStruct> get representativesList =>
+      _representativesList ?? const [];
+  bool hasRepresentativesList() => _representativesList != null;
+
+  // "presDataList" field.
+  List<RepsInfoStruct>? _presDataList;
+  List<RepsInfoStruct> get presDataList => _presDataList ?? const [];
+  bool hasPresDataList() => _presDataList != null;
+
+  // "vicePresDataList" field.
+  List<RepsInfoStruct>? _vicePresDataList;
+  List<RepsInfoStruct> get vicePresDataList => _vicePresDataList ?? const [];
+  bool hasVicePresDataList() => _vicePresDataList != null;
+
+  // "secDataList" field.
+  List<RepsInfoStruct>? _secDataList;
+  List<RepsInfoStruct> get secDataList => _secDataList ?? const [];
+  bool hasSecDataList() => _secDataList != null;
+
+  // "treasurerDataList" field.
+  List<RepsInfoStruct>? _treasurerDataList;
+  List<RepsInfoStruct> get treasurerDataList => _treasurerDataList ?? const [];
+  bool hasTreasurerDataList() => _treasurerDataList != null;
+
+  // "auditorDataList" field.
+  List<RepsInfoStruct>? _auditorDataList;
+  List<RepsInfoStruct> get auditorDataList => _auditorDataList ?? const [];
+  bool hasAuditorDataList() => _auditorDataList != null;
+
+  // "businessManagerDataList" field.
+  List<RepsInfoStruct>? _businessManagerDataList;
+  List<RepsInfoStruct> get businessManagerDataList =>
+      _businessManagerDataList ?? const [];
+  bool hasBusinessManagerDataList() => _businessManagerDataList != null;
+
+  // "pioDataList" field.
+  List<RepsInfoStruct>? _pioDataList;
+  List<RepsInfoStruct> get pioDataList => _pioDataList ?? const [];
+  bool hasPioDataList() => _pioDataList != null;
 
   void _initializeFields() {
     _displayName = snapshotData['display_name'] as String?;
@@ -160,7 +197,38 @@ class UsersRecord extends FirestoreRecord {
     _repVote = snapshotData['repVote'] as bool?;
     _isCandidate = snapshotData['is_candidate'] as bool?;
     _isVerified = snapshotData['is_verified'] as bool?;
-    _positionListForReps = getDataList(snapshotData['positionListForReps']);
+    _representativesList = getStructList(
+      snapshotData['representativesList'],
+      RepsInfoStruct.fromMap,
+    );
+    _presDataList = getStructList(
+      snapshotData['presDataList'],
+      RepsInfoStruct.fromMap,
+    );
+    _vicePresDataList = getStructList(
+      snapshotData['vicePresDataList'],
+      RepsInfoStruct.fromMap,
+    );
+    _secDataList = getStructList(
+      snapshotData['secDataList'],
+      RepsInfoStruct.fromMap,
+    );
+    _treasurerDataList = getStructList(
+      snapshotData['treasurerDataList'],
+      RepsInfoStruct.fromMap,
+    );
+    _auditorDataList = getStructList(
+      snapshotData['auditorDataList'],
+      RepsInfoStruct.fromMap,
+    );
+    _businessManagerDataList = getStructList(
+      snapshotData['businessManagerDataList'],
+      RepsInfoStruct.fromMap,
+    );
+    _pioDataList = getStructList(
+      snapshotData['pioDataList'],
+      RepsInfoStruct.fromMap,
+    );
   }
 
   static CollectionReference get collection =>
@@ -281,7 +349,15 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e1?.repVote == e2?.repVote &&
         e1?.isCandidate == e2?.isCandidate &&
         e1?.isVerified == e2?.isVerified &&
-        listEquality.equals(e1?.positionListForReps, e2?.positionListForReps);
+        listEquality.equals(e1?.representativesList, e2?.representativesList) &&
+        listEquality.equals(e1?.presDataList, e2?.presDataList) &&
+        listEquality.equals(e1?.vicePresDataList, e2?.vicePresDataList) &&
+        listEquality.equals(e1?.secDataList, e2?.secDataList) &&
+        listEquality.equals(e1?.treasurerDataList, e2?.treasurerDataList) &&
+        listEquality.equals(e1?.auditorDataList, e2?.auditorDataList) &&
+        listEquality.equals(
+            e1?.businessManagerDataList, e2?.businessManagerDataList) &&
+        listEquality.equals(e1?.pioDataList, e2?.pioDataList);
   }
 
   @override
@@ -309,7 +385,14 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.repVote,
         e?.isCandidate,
         e?.isVerified,
-        e?.positionListForReps
+        e?.representativesList,
+        e?.presDataList,
+        e?.vicePresDataList,
+        e?.secDataList,
+        e?.treasurerDataList,
+        e?.auditorDataList,
+        e?.businessManagerDataList,
+        e?.pioDataList
       ]);
 
   @override

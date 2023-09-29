@@ -1,8 +1,11 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
+import '/backend/schema/structs/index.dart';
+import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/flutter_flow/custom_functions.dart' as functions;
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +59,9 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
     context.watch<FFAppState>();
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(_model.unfocusNode),
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
@@ -201,7 +206,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
                                   'studentHome',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -289,7 +294,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
                                   'studentDashboard',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -449,7 +454,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
                                   'studentSetting',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -774,11 +779,14 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     UsersRecord>>(
                                                               stream:
                                                                   queryUsersRecord(
-                                                                queryBuilder: (usersRecord) =>
-                                                                    usersRecord.where(
-                                                                        'position',
-                                                                        isEqualTo:
-                                                                            'president'),
+                                                                queryBuilder:
+                                                                    (usersRecord) =>
+                                                                        usersRecord
+                                                                            .where(
+                                                                  'position',
+                                                                  isEqualTo:
+                                                                      'president',
+                                                                ),
                                                               ),
                                                               builder: (context,
                                                                   snapshot) {
@@ -835,6 +843,9 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                       mainAxisSize:
                                                                           MainAxisSize
                                                                               .max,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
                                                                       children: [
                                                                         if (valueOrDefault<bool>(currentUserDocument?.presVote,
                                                                                 false) ==
@@ -863,13 +874,35 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update(createUsersRecordData(
-                                                                                    presVote: true,
-                                                                                  ));
+                                                                                  await currentUserReference!.update({
+                                                                                    ...createUsersRecordData(
+                                                                                      presVote: true,
+                                                                                    ),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'presDataList': FieldValue.arrayUnion([
+                                                                                          getRepsInfoFirestoreData(
+                                                                                            updateRepsInfoStruct(
+                                                                                              RepsInfoStruct(
+                                                                                                photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                              ),
+                                                                                              clearUnsetFields: false,
+                                                                                            ),
+                                                                                            true,
+                                                                                          )
+                                                                                        ]),
+                                                                                      },
+                                                                                    ),
+                                                                                  });
                                                                                   setState(() {});
 
                                                                                   await listViewUsersRecord.reference.update({
-                                                                                    'voteCount': FieldValue.increment(1),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                      },
+                                                                                    ),
                                                                                   });
                                                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                                                     SnackBar(
@@ -922,76 +955,54 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                   AlignmentDirectional(
                                                                       0.00,
                                                                       0.00),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  if (valueOrDefault<
-                                                                              bool>(
-                                                                          currentUserDocument
-                                                                              ?.presVote,
-                                                                          false) ==
-                                                                      true)
-                                                                    Align(
-                                                                      alignment: AlignmentDirectional(
-                                                                          0.00,
-                                                                          0.00),
-                                                                      child:
-                                                                          AuthUserStreamWidget(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                StreamBuilder<List<UsersRecord>>(
-                                                                          stream:
-                                                                              queryUsersRecord(
-                                                                            queryBuilder: (usersRecord) =>
-                                                                                usersRecord.where('position', isEqualTo: 'president'),
-                                                                            singleRecord:
-                                                                                true,
-                                                                          ),
-                                                                          builder:
-                                                                              (context, snapshot) {
-                                                                            // Customize what your widget looks like when it's loading.
-                                                                            if (!snapshot.hasData) {
-                                                                              return Center(
-                                                                                child: SizedBox(
-                                                                                  width: 50.0,
-                                                                                  height: 50.0,
-                                                                                  child: CircularProgressIndicator(
-                                                                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                                                                      FlutterFlowTheme.of(context).primary,
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              );
-                                                                            }
-                                                                            List<UsersRecord>
-                                                                                columnUsersRecordList =
-                                                                                snapshot.data!;
-                                                                            final columnUsersRecord = columnUsersRecordList.isNotEmpty
-                                                                                ? columnUsersRecordList.first
-                                                                                : null;
-                                                                            return Column(
+                                                              child:
+                                                                  AuthUserStreamWidget(
+                                                                builder:
+                                                                    (context) =>
+                                                                        Builder(
+                                                                  builder:
+                                                                      (context) {
+                                                                    final presName = (currentUserDocument?.presDataList?.toList() ??
+                                                                            [])
+                                                                        .toList()
+                                                                        .take(1)
+                                                                        .toList();
+                                                                    return Row(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: List.generate(
+                                                                          presName
+                                                                              .length,
+                                                                          (presNameIndex) {
+                                                                        final presNameItem =
+                                                                            presName[presNameIndex];
+                                                                        return Visibility(
+                                                                          visible:
+                                                                              valueOrDefault<bool>(currentUserDocument?.presVote, false) == true,
+                                                                          child:
+                                                                              Align(
+                                                                            alignment:
+                                                                                AlignmentDirectional(0.00, 0.00),
+                                                                            child:
+                                                                                Column(
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
                                                                                 ClipRRect(
                                                                                   borderRadius: BorderRadius.circular(8.0),
                                                                                   child: Image.network(
-                                                                                    valueOrDefault<String>(
-                                                                                      columnUsersRecord?.photoUrl,
-                                                                                      'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
-                                                                                    ),
+                                                                                    presNameItem.photoUrl,
                                                                                     width: 100.0,
                                                                                     height: 100.0,
                                                                                     fit: BoxFit.cover,
                                                                                   ),
                                                                                 ),
                                                                                 GradientText(
-                                                                                  columnUsersRecord!.displayName,
+                                                                                  presNameItem.displayName,
                                                                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                                                         fontFamily: 'Readex Pro',
                                                                                         color: FlutterFlowTheme.of(context).info,
@@ -1004,12 +1015,13 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   gradientType: GradientType.linear,
                                                                                 ),
                                                                               ],
-                                                                            );
-                                                                          },
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                ],
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      }),
+                                                                    );
+                                                                  },
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -1062,11 +1074,14 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     UsersRecord>>(
                                                               stream:
                                                                   queryUsersRecord(
-                                                                queryBuilder: (usersRecord) =>
-                                                                    usersRecord.where(
-                                                                        'position',
-                                                                        isEqualTo:
-                                                                            'vicePresident'),
+                                                                queryBuilder:
+                                                                    (usersRecord) =>
+                                                                        usersRecord
+                                                                            .where(
+                                                                  'position',
+                                                                  isEqualTo:
+                                                                      'vicePresident',
+                                                                ),
                                                               ),
                                                               builder: (context,
                                                                   snapshot) {
@@ -1123,6 +1138,9 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                       mainAxisSize:
                                                                           MainAxisSize
                                                                               .max,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
                                                                       children: [
                                                                         if (valueOrDefault<bool>(currentUserDocument?.vpresVote,
                                                                                 false) ==
@@ -1151,13 +1169,35 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update(createUsersRecordData(
-                                                                                    vpresVote: true,
-                                                                                  ));
+                                                                                  await currentUserReference!.update({
+                                                                                    ...createUsersRecordData(
+                                                                                      vpresVote: true,
+                                                                                    ),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'vicePresDataList': FieldValue.arrayUnion([
+                                                                                          getRepsInfoFirestoreData(
+                                                                                            updateRepsInfoStruct(
+                                                                                              RepsInfoStruct(
+                                                                                                photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                              ),
+                                                                                              clearUnsetFields: false,
+                                                                                            ),
+                                                                                            true,
+                                                                                          )
+                                                                                        ]),
+                                                                                      },
+                                                                                    ),
+                                                                                  });
                                                                                   setState(() {});
 
                                                                                   await listViewUsersRecord.reference.update({
-                                                                                    'voteCount': FieldValue.increment(1),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                      },
+                                                                                    ),
                                                                                   });
                                                                                 }
                                                                               },
@@ -1195,59 +1235,40 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                   AlignmentDirectional(
                                                                       0.00,
                                                                       0.00),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  if (valueOrDefault<
-                                                                              bool>(
-                                                                          currentUserDocument
-                                                                              ?.vpresVote,
-                                                                          false) ==
-                                                                      true)
-                                                                    Align(
-                                                                      alignment: AlignmentDirectional(
-                                                                          0.00,
-                                                                          0.00),
-                                                                      child:
-                                                                          AuthUserStreamWidget(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                StreamBuilder<List<UsersRecord>>(
-                                                                          stream:
-                                                                              queryUsersRecord(
-                                                                            queryBuilder: (usersRecord) =>
-                                                                                usersRecord.where('position', isEqualTo: 'vicePresident'),
-                                                                            singleRecord:
-                                                                                true,
-                                                                          ),
-                                                                          builder:
-                                                                              (context, snapshot) {
-                                                                            // Customize what your widget looks like when it's loading.
-                                                                            if (!snapshot.hasData) {
-                                                                              return Center(
-                                                                                child: SizedBox(
-                                                                                  width: 50.0,
-                                                                                  height: 50.0,
-                                                                                  child: CircularProgressIndicator(
-                                                                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                                                                      FlutterFlowTheme.of(context).primary,
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              );
-                                                                            }
-                                                                            List<UsersRecord>
-                                                                                columnUsersRecordList =
-                                                                                snapshot.data!;
-                                                                            final columnUsersRecord = columnUsersRecordList.isNotEmpty
-                                                                                ? columnUsersRecordList.first
-                                                                                : null;
-                                                                            return Column(
+                                                              child:
+                                                                  AuthUserStreamWidget(
+                                                                builder:
+                                                                    (context) =>
+                                                                        Builder(
+                                                                  builder:
+                                                                      (context) {
+                                                                    final vicePresName = (currentUserDocument?.vicePresDataList?.toList() ??
+                                                                            [])
+                                                                        .toList()
+                                                                        .take(1)
+                                                                        .toList();
+                                                                    return Row(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: List.generate(
+                                                                          vicePresName
+                                                                              .length,
+                                                                          (vicePresNameIndex) {
+                                                                        final vicePresNameItem =
+                                                                            vicePresName[vicePresNameIndex];
+                                                                        return Visibility(
+                                                                          visible:
+                                                                              valueOrDefault<bool>(currentUserDocument?.vpresVote, false) == true,
+                                                                          child:
+                                                                              Align(
+                                                                            alignment:
+                                                                                AlignmentDirectional(0.00, 0.00),
+                                                                            child:
+                                                                                Column(
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
@@ -1257,7 +1278,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     borderRadius: BorderRadius.circular(8.0),
                                                                                     child: Image.network(
                                                                                       valueOrDefault<String>(
-                                                                                        columnUsersRecord?.photoUrl,
+                                                                                        vicePresNameItem.photoUrl,
                                                                                         'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
                                                                                       ),
                                                                                       width: 100.0,
@@ -1267,7 +1288,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   ),
                                                                                 ),
                                                                                 GradientText(
-                                                                                  columnUsersRecord!.displayName,
+                                                                                  vicePresNameItem.displayName,
                                                                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                                                         fontFamily: 'Readex Pro',
                                                                                         color: FlutterFlowTheme.of(context).info,
@@ -1280,12 +1301,13 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   gradientType: GradientType.linear,
                                                                                 ),
                                                                               ],
-                                                                            );
-                                                                          },
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                ],
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      }),
+                                                                    );
+                                                                  },
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -1338,11 +1360,14 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     UsersRecord>>(
                                                               stream:
                                                                   queryUsersRecord(
-                                                                queryBuilder: (usersRecord) =>
-                                                                    usersRecord.where(
-                                                                        'position',
-                                                                        isEqualTo:
-                                                                            'secretary'),
+                                                                queryBuilder:
+                                                                    (usersRecord) =>
+                                                                        usersRecord
+                                                                            .where(
+                                                                  'position',
+                                                                  isEqualTo:
+                                                                      'secretary',
+                                                                ),
                                                               ),
                                                               builder: (context,
                                                                   snapshot) {
@@ -1399,6 +1424,9 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                       mainAxisSize:
                                                                           MainAxisSize
                                                                               .max,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
                                                                       children: [
                                                                         if (valueOrDefault<bool>(currentUserDocument?.secVote,
                                                                                 false) ==
@@ -1427,13 +1455,35 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update(createUsersRecordData(
-                                                                                    secVote: true,
-                                                                                  ));
+                                                                                  await currentUserReference!.update({
+                                                                                    ...createUsersRecordData(
+                                                                                      secVote: true,
+                                                                                    ),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'secDataList': FieldValue.arrayUnion([
+                                                                                          getRepsInfoFirestoreData(
+                                                                                            updateRepsInfoStruct(
+                                                                                              RepsInfoStruct(
+                                                                                                photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                              ),
+                                                                                              clearUnsetFields: false,
+                                                                                            ),
+                                                                                            true,
+                                                                                          )
+                                                                                        ]),
+                                                                                      },
+                                                                                    ),
+                                                                                  });
                                                                                   setState(() {});
 
                                                                                   await listViewUsersRecord.reference.update({
-                                                                                    'voteCount': FieldValue.increment(1),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                      },
+                                                                                    ),
                                                                                   });
                                                                                 }
                                                                               },
@@ -1471,59 +1521,40 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                   AlignmentDirectional(
                                                                       0.00,
                                                                       0.00),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  if (valueOrDefault<
-                                                                              bool>(
-                                                                          currentUserDocument
-                                                                              ?.secVote,
-                                                                          false) ==
-                                                                      true)
-                                                                    Align(
-                                                                      alignment: AlignmentDirectional(
-                                                                          0.00,
-                                                                          0.00),
-                                                                      child:
-                                                                          AuthUserStreamWidget(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                StreamBuilder<List<UsersRecord>>(
-                                                                          stream:
-                                                                              queryUsersRecord(
-                                                                            queryBuilder: (usersRecord) =>
-                                                                                usersRecord.where('position', isEqualTo: 'secretary'),
-                                                                            singleRecord:
-                                                                                true,
-                                                                          ),
-                                                                          builder:
-                                                                              (context, snapshot) {
-                                                                            // Customize what your widget looks like when it's loading.
-                                                                            if (!snapshot.hasData) {
-                                                                              return Center(
-                                                                                child: SizedBox(
-                                                                                  width: 50.0,
-                                                                                  height: 50.0,
-                                                                                  child: CircularProgressIndicator(
-                                                                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                                                                      FlutterFlowTheme.of(context).primary,
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              );
-                                                                            }
-                                                                            List<UsersRecord>
-                                                                                columnUsersRecordList =
-                                                                                snapshot.data!;
-                                                                            final columnUsersRecord = columnUsersRecordList.isNotEmpty
-                                                                                ? columnUsersRecordList.first
-                                                                                : null;
-                                                                            return Column(
+                                                              child:
+                                                                  AuthUserStreamWidget(
+                                                                builder:
+                                                                    (context) =>
+                                                                        Builder(
+                                                                  builder:
+                                                                      (context) {
+                                                                    final secName = (currentUserDocument?.secDataList?.toList() ??
+                                                                            [])
+                                                                        .toList()
+                                                                        .take(1)
+                                                                        .toList();
+                                                                    return Row(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: List.generate(
+                                                                          secName
+                                                                              .length,
+                                                                          (secNameIndex) {
+                                                                        final secNameItem =
+                                                                            secName[secNameIndex];
+                                                                        return Visibility(
+                                                                          visible:
+                                                                              valueOrDefault<bool>(currentUserDocument?.secVote, false) == true,
+                                                                          child:
+                                                                              Align(
+                                                                            alignment:
+                                                                                AlignmentDirectional(0.00, 0.00),
+                                                                            child:
+                                                                                Column(
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
@@ -1533,7 +1564,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     borderRadius: BorderRadius.circular(8.0),
                                                                                     child: Image.network(
                                                                                       valueOrDefault<String>(
-                                                                                        columnUsersRecord?.photoUrl,
+                                                                                        secNameItem.photoUrl,
                                                                                         'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
                                                                                       ),
                                                                                       width: 100.0,
@@ -1543,7 +1574,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   ),
                                                                                 ),
                                                                                 GradientText(
-                                                                                  columnUsersRecord!.displayName,
+                                                                                  secNameItem.displayName,
                                                                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                                                         fontFamily: 'Readex Pro',
                                                                                         color: FlutterFlowTheme.of(context).info,
@@ -1556,12 +1587,13 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   gradientType: GradientType.linear,
                                                                                 ),
                                                                               ],
-                                                                            );
-                                                                          },
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                ],
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      }),
+                                                                    );
+                                                                  },
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -1614,11 +1646,14 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     UsersRecord>>(
                                                               stream:
                                                                   queryUsersRecord(
-                                                                queryBuilder: (usersRecord) =>
-                                                                    usersRecord.where(
-                                                                        'position',
-                                                                        isEqualTo:
-                                                                            'treasurer'),
+                                                                queryBuilder:
+                                                                    (usersRecord) =>
+                                                                        usersRecord
+                                                                            .where(
+                                                                  'position',
+                                                                  isEqualTo:
+                                                                      'treasurer',
+                                                                ),
                                                               ),
                                                               builder: (context,
                                                                   snapshot) {
@@ -1675,6 +1710,9 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                       mainAxisSize:
                                                                           MainAxisSize
                                                                               .max,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
                                                                       children: [
                                                                         if (valueOrDefault<bool>(currentUserDocument?.treasVote,
                                                                                 false) ==
@@ -1703,13 +1741,35 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update(createUsersRecordData(
-                                                                                    treasVote: true,
-                                                                                  ));
+                                                                                  await currentUserReference!.update({
+                                                                                    ...createUsersRecordData(
+                                                                                      treasVote: true,
+                                                                                    ),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'treasurerDataList': FieldValue.arrayUnion([
+                                                                                          getRepsInfoFirestoreData(
+                                                                                            updateRepsInfoStruct(
+                                                                                              RepsInfoStruct(
+                                                                                                photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                              ),
+                                                                                              clearUnsetFields: false,
+                                                                                            ),
+                                                                                            true,
+                                                                                          )
+                                                                                        ]),
+                                                                                      },
+                                                                                    ),
+                                                                                  });
                                                                                   setState(() {});
 
                                                                                   await listViewUsersRecord.reference.update({
-                                                                                    'voteCount': FieldValue.increment(1),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                      },
+                                                                                    ),
                                                                                   });
                                                                                 }
                                                                               },
@@ -1747,59 +1807,40 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                   AlignmentDirectional(
                                                                       0.00,
                                                                       0.00),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  if (valueOrDefault<
-                                                                              bool>(
-                                                                          currentUserDocument
-                                                                              ?.treasVote,
-                                                                          false) ==
-                                                                      true)
-                                                                    Align(
-                                                                      alignment: AlignmentDirectional(
-                                                                          0.00,
-                                                                          0.00),
-                                                                      child:
-                                                                          AuthUserStreamWidget(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                StreamBuilder<List<UsersRecord>>(
-                                                                          stream:
-                                                                              queryUsersRecord(
-                                                                            queryBuilder: (usersRecord) =>
-                                                                                usersRecord.where('position', isEqualTo: 'treasurer'),
-                                                                            singleRecord:
-                                                                                true,
-                                                                          ),
-                                                                          builder:
-                                                                              (context, snapshot) {
-                                                                            // Customize what your widget looks like when it's loading.
-                                                                            if (!snapshot.hasData) {
-                                                                              return Center(
-                                                                                child: SizedBox(
-                                                                                  width: 50.0,
-                                                                                  height: 50.0,
-                                                                                  child: CircularProgressIndicator(
-                                                                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                                                                      FlutterFlowTheme.of(context).primary,
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              );
-                                                                            }
-                                                                            List<UsersRecord>
-                                                                                columnUsersRecordList =
-                                                                                snapshot.data!;
-                                                                            final columnUsersRecord = columnUsersRecordList.isNotEmpty
-                                                                                ? columnUsersRecordList.first
-                                                                                : null;
-                                                                            return Column(
+                                                              child:
+                                                                  AuthUserStreamWidget(
+                                                                builder:
+                                                                    (context) =>
+                                                                        Builder(
+                                                                  builder:
+                                                                      (context) {
+                                                                    final treasurerName = (currentUserDocument?.treasurerDataList?.toList() ??
+                                                                            [])
+                                                                        .toList()
+                                                                        .take(1)
+                                                                        .toList();
+                                                                    return Row(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: List.generate(
+                                                                          treasurerName
+                                                                              .length,
+                                                                          (treasurerNameIndex) {
+                                                                        final treasurerNameItem =
+                                                                            treasurerName[treasurerNameIndex];
+                                                                        return Visibility(
+                                                                          visible:
+                                                                              valueOrDefault<bool>(currentUserDocument?.treasVote, false) == true,
+                                                                          child:
+                                                                              Align(
+                                                                            alignment:
+                                                                                AlignmentDirectional(0.00, 0.00),
+                                                                            child:
+                                                                                Column(
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
@@ -1809,7 +1850,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     borderRadius: BorderRadius.circular(8.0),
                                                                                     child: Image.network(
                                                                                       valueOrDefault<String>(
-                                                                                        columnUsersRecord?.photoUrl,
+                                                                                        treasurerNameItem.photoUrl,
                                                                                         'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
                                                                                       ),
                                                                                       width: 100.0,
@@ -1819,7 +1860,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   ),
                                                                                 ),
                                                                                 GradientText(
-                                                                                  columnUsersRecord!.displayName,
+                                                                                  treasurerNameItem.displayName,
                                                                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                                                         fontFamily: 'Readex Pro',
                                                                                         color: FlutterFlowTheme.of(context).info,
@@ -1832,12 +1873,13 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   gradientType: GradientType.linear,
                                                                                 ),
                                                                               ],
-                                                                            );
-                                                                          },
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                ],
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      }),
+                                                                    );
+                                                                  },
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -1890,11 +1932,14 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     UsersRecord>>(
                                                               stream:
                                                                   queryUsersRecord(
-                                                                queryBuilder: (usersRecord) =>
-                                                                    usersRecord.where(
-                                                                        'position',
-                                                                        isEqualTo:
-                                                                            'auditor'),
+                                                                queryBuilder:
+                                                                    (usersRecord) =>
+                                                                        usersRecord
+                                                                            .where(
+                                                                  'position',
+                                                                  isEqualTo:
+                                                                      'auditor',
+                                                                ),
                                                               ),
                                                               builder: (context,
                                                                   snapshot) {
@@ -1951,6 +1996,9 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                       mainAxisSize:
                                                                           MainAxisSize
                                                                               .max,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
                                                                       children: [
                                                                         if (valueOrDefault<bool>(currentUserDocument?.audiVote,
                                                                                 false) ==
@@ -1979,13 +2027,35 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update(createUsersRecordData(
-                                                                                    audiVote: true,
-                                                                                  ));
+                                                                                  await currentUserReference!.update({
+                                                                                    ...createUsersRecordData(
+                                                                                      audiVote: true,
+                                                                                    ),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'auditorDataList': FieldValue.arrayUnion([
+                                                                                          getRepsInfoFirestoreData(
+                                                                                            updateRepsInfoStruct(
+                                                                                              RepsInfoStruct(
+                                                                                                photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                              ),
+                                                                                              clearUnsetFields: false,
+                                                                                            ),
+                                                                                            true,
+                                                                                          )
+                                                                                        ]),
+                                                                                      },
+                                                                                    ),
+                                                                                  });
                                                                                   setState(() {});
 
                                                                                   await listViewUsersRecord.reference.update({
-                                                                                    'voteCount': FieldValue.increment(1),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                      },
+                                                                                    ),
                                                                                   });
                                                                                 }
                                                                               },
@@ -2023,59 +2093,40 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                   AlignmentDirectional(
                                                                       0.00,
                                                                       0.00),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  if (valueOrDefault<
-                                                                              bool>(
-                                                                          currentUserDocument
-                                                                              ?.audiVote,
-                                                                          false) ==
-                                                                      true)
-                                                                    Align(
-                                                                      alignment: AlignmentDirectional(
-                                                                          0.00,
-                                                                          0.00),
-                                                                      child:
-                                                                          AuthUserStreamWidget(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                StreamBuilder<List<UsersRecord>>(
-                                                                          stream:
-                                                                              queryUsersRecord(
-                                                                            queryBuilder: (usersRecord) =>
-                                                                                usersRecord.where('position', isEqualTo: 'auditor'),
-                                                                            singleRecord:
-                                                                                true,
-                                                                          ),
-                                                                          builder:
-                                                                              (context, snapshot) {
-                                                                            // Customize what your widget looks like when it's loading.
-                                                                            if (!snapshot.hasData) {
-                                                                              return Center(
-                                                                                child: SizedBox(
-                                                                                  width: 50.0,
-                                                                                  height: 50.0,
-                                                                                  child: CircularProgressIndicator(
-                                                                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                                                                      FlutterFlowTheme.of(context).primary,
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              );
-                                                                            }
-                                                                            List<UsersRecord>
-                                                                                columnUsersRecordList =
-                                                                                snapshot.data!;
-                                                                            final columnUsersRecord = columnUsersRecordList.isNotEmpty
-                                                                                ? columnUsersRecordList.first
-                                                                                : null;
-                                                                            return Column(
+                                                              child:
+                                                                  AuthUserStreamWidget(
+                                                                builder:
+                                                                    (context) =>
+                                                                        Builder(
+                                                                  builder:
+                                                                      (context) {
+                                                                    final auditorName = (currentUserDocument?.auditorDataList?.toList() ??
+                                                                            [])
+                                                                        .toList()
+                                                                        .take(1)
+                                                                        .toList();
+                                                                    return Row(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: List.generate(
+                                                                          auditorName
+                                                                              .length,
+                                                                          (auditorNameIndex) {
+                                                                        final auditorNameItem =
+                                                                            auditorName[auditorNameIndex];
+                                                                        return Visibility(
+                                                                          visible:
+                                                                              valueOrDefault<bool>(currentUserDocument?.audiVote, false) == true,
+                                                                          child:
+                                                                              Align(
+                                                                            alignment:
+                                                                                AlignmentDirectional(0.00, 0.00),
+                                                                            child:
+                                                                                Column(
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
@@ -2085,7 +2136,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     borderRadius: BorderRadius.circular(8.0),
                                                                                     child: Image.network(
                                                                                       valueOrDefault<String>(
-                                                                                        columnUsersRecord?.photoUrl,
+                                                                                        auditorNameItem.photoUrl,
                                                                                         'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
                                                                                       ),
                                                                                       width: 100.0,
@@ -2095,7 +2146,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   ),
                                                                                 ),
                                                                                 GradientText(
-                                                                                  columnUsersRecord!.displayName,
+                                                                                  auditorNameItem.displayName,
                                                                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                                                         fontFamily: 'Readex Pro',
                                                                                         color: FlutterFlowTheme.of(context).info,
@@ -2109,12 +2160,13 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   gradientType: GradientType.linear,
                                                                                 ),
                                                                               ],
-                                                                            );
-                                                                          },
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                ],
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      }),
+                                                                    );
+                                                                  },
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -2167,11 +2219,14 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     UsersRecord>>(
                                                               stream:
                                                                   queryUsersRecord(
-                                                                queryBuilder: (usersRecord) =>
-                                                                    usersRecord.where(
-                                                                        'position',
-                                                                        isEqualTo:
-                                                                            'businessManager'),
+                                                                queryBuilder:
+                                                                    (usersRecord) =>
+                                                                        usersRecord
+                                                                            .where(
+                                                                  'position',
+                                                                  isEqualTo:
+                                                                      'businessManager',
+                                                                ),
                                                               ),
                                                               builder: (context,
                                                                   snapshot) {
@@ -2256,13 +2311,35 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update(createUsersRecordData(
-                                                                                    bmanVote: true,
-                                                                                  ));
+                                                                                  await currentUserReference!.update({
+                                                                                    ...createUsersRecordData(
+                                                                                      bmanVote: true,
+                                                                                    ),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'businessManagerDataList': FieldValue.arrayUnion([
+                                                                                          getRepsInfoFirestoreData(
+                                                                                            updateRepsInfoStruct(
+                                                                                              RepsInfoStruct(
+                                                                                                photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                              ),
+                                                                                              clearUnsetFields: false,
+                                                                                            ),
+                                                                                            true,
+                                                                                          )
+                                                                                        ]),
+                                                                                      },
+                                                                                    ),
+                                                                                  });
                                                                                   setState(() {});
 
                                                                                   await listViewUsersRecord.reference.update({
-                                                                                    'voteCount': FieldValue.increment(1),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                      },
+                                                                                    ),
                                                                                   });
                                                                                 }
                                                                               },
@@ -2300,59 +2377,40 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                   AlignmentDirectional(
                                                                       0.00,
                                                                       0.00),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  if (valueOrDefault<
-                                                                              bool>(
-                                                                          currentUserDocument
-                                                                              ?.bmanVote,
-                                                                          false) ==
-                                                                      true)
-                                                                    Align(
-                                                                      alignment: AlignmentDirectional(
-                                                                          0.00,
-                                                                          0.00),
-                                                                      child:
-                                                                          AuthUserStreamWidget(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                StreamBuilder<List<UsersRecord>>(
-                                                                          stream:
-                                                                              queryUsersRecord(
-                                                                            queryBuilder: (usersRecord) =>
-                                                                                usersRecord.where('position', isEqualTo: 'businessManager'),
-                                                                            singleRecord:
-                                                                                true,
-                                                                          ),
-                                                                          builder:
-                                                                              (context, snapshot) {
-                                                                            // Customize what your widget looks like when it's loading.
-                                                                            if (!snapshot.hasData) {
-                                                                              return Center(
-                                                                                child: SizedBox(
-                                                                                  width: 50.0,
-                                                                                  height: 50.0,
-                                                                                  child: CircularProgressIndicator(
-                                                                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                                                                      FlutterFlowTheme.of(context).primary,
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              );
-                                                                            }
-                                                                            List<UsersRecord>
-                                                                                columnUsersRecordList =
-                                                                                snapshot.data!;
-                                                                            final columnUsersRecord = columnUsersRecordList.isNotEmpty
-                                                                                ? columnUsersRecordList.first
-                                                                                : null;
-                                                                            return Column(
+                                                              child:
+                                                                  AuthUserStreamWidget(
+                                                                builder:
+                                                                    (context) =>
+                                                                        Builder(
+                                                                  builder:
+                                                                      (context) {
+                                                                    final businessManager = (currentUserDocument?.businessManagerDataList?.toList() ??
+                                                                            [])
+                                                                        .toList()
+                                                                        .take(1)
+                                                                        .toList();
+                                                                    return Row(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: List.generate(
+                                                                          businessManager
+                                                                              .length,
+                                                                          (businessManagerIndex) {
+                                                                        final businessManagerItem =
+                                                                            businessManager[businessManagerIndex];
+                                                                        return Visibility(
+                                                                          visible:
+                                                                              valueOrDefault<bool>(currentUserDocument?.bmanVote, false) == true,
+                                                                          child:
+                                                                              Align(
+                                                                            alignment:
+                                                                                AlignmentDirectional(0.00, 0.00),
+                                                                            child:
+                                                                                Column(
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
@@ -2360,7 +2418,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   borderRadius: BorderRadius.circular(8.0),
                                                                                   child: Image.network(
                                                                                     valueOrDefault<String>(
-                                                                                      columnUsersRecord?.photoUrl,
+                                                                                      businessManagerItem.photoUrl,
                                                                                       'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
                                                                                     ),
                                                                                     width: 100.0,
@@ -2369,7 +2427,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   ),
                                                                                 ),
                                                                                 GradientText(
-                                                                                  columnUsersRecord!.displayName,
+                                                                                  businessManagerItem.displayName,
                                                                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                                                         fontFamily: 'Readex Pro',
                                                                                         color: FlutterFlowTheme.of(context).info,
@@ -2382,12 +2440,13 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   gradientType: GradientType.linear,
                                                                                 ),
                                                                               ],
-                                                                            );
-                                                                          },
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                ],
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      }),
+                                                                    );
+                                                                  },
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -2440,11 +2499,14 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     UsersRecord>>(
                                                               stream:
                                                                   queryUsersRecord(
-                                                                queryBuilder: (usersRecord) =>
-                                                                    usersRecord.where(
-                                                                        'position',
-                                                                        isEqualTo:
-                                                                            'pio'),
+                                                                queryBuilder:
+                                                                    (usersRecord) =>
+                                                                        usersRecord
+                                                                            .where(
+                                                                  'position',
+                                                                  isEqualTo:
+                                                                      'pio',
+                                                                ),
                                                               ),
                                                               builder: (context,
                                                                   snapshot) {
@@ -2501,6 +2563,9 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                       mainAxisSize:
                                                                           MainAxisSize
                                                                               .max,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
                                                                       children: [
                                                                         if (valueOrDefault<bool>(currentUserDocument?.pioVote,
                                                                                 false) ==
@@ -2529,13 +2594,35 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update(createUsersRecordData(
-                                                                                    pioVote: true,
-                                                                                  ));
+                                                                                  await currentUserReference!.update({
+                                                                                    ...createUsersRecordData(
+                                                                                      pioVote: true,
+                                                                                    ),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'pioDataList': FieldValue.arrayUnion([
+                                                                                          getRepsInfoFirestoreData(
+                                                                                            updateRepsInfoStruct(
+                                                                                              RepsInfoStruct(
+                                                                                                photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                              ),
+                                                                                              clearUnsetFields: false,
+                                                                                            ),
+                                                                                            true,
+                                                                                          )
+                                                                                        ]),
+                                                                                      },
+                                                                                    ),
+                                                                                  });
                                                                                   setState(() {});
 
                                                                                   await listViewUsersRecord.reference.update({
-                                                                                    'voteCount': FieldValue.increment(1),
+                                                                                    ...mapToFirestore(
+                                                                                      {
+                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                      },
+                                                                                    ),
                                                                                   });
                                                                                 }
                                                                               },
@@ -2573,59 +2660,40 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                   AlignmentDirectional(
                                                                       0.00,
                                                                       0.00),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  if (valueOrDefault<
-                                                                              bool>(
-                                                                          currentUserDocument
-                                                                              ?.pioVote,
-                                                                          false) ==
-                                                                      true)
-                                                                    Align(
-                                                                      alignment: AlignmentDirectional(
-                                                                          0.00,
-                                                                          0.00),
-                                                                      child:
-                                                                          AuthUserStreamWidget(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                StreamBuilder<List<UsersRecord>>(
-                                                                          stream:
-                                                                              queryUsersRecord(
-                                                                            queryBuilder: (usersRecord) =>
-                                                                                usersRecord.where('position', isEqualTo: 'pio'),
-                                                                            singleRecord:
-                                                                                true,
-                                                                          ),
-                                                                          builder:
-                                                                              (context, snapshot) {
-                                                                            // Customize what your widget looks like when it's loading.
-                                                                            if (!snapshot.hasData) {
-                                                                              return Center(
-                                                                                child: SizedBox(
-                                                                                  width: 50.0,
-                                                                                  height: 50.0,
-                                                                                  child: CircularProgressIndicator(
-                                                                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                                                                      FlutterFlowTheme.of(context).primary,
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              );
-                                                                            }
-                                                                            List<UsersRecord>
-                                                                                columnUsersRecordList =
-                                                                                snapshot.data!;
-                                                                            final columnUsersRecord = columnUsersRecordList.isNotEmpty
-                                                                                ? columnUsersRecordList.first
-                                                                                : null;
-                                                                            return Column(
+                                                              child:
+                                                                  AuthUserStreamWidget(
+                                                                builder:
+                                                                    (context) =>
+                                                                        Builder(
+                                                                  builder:
+                                                                      (context) {
+                                                                    final pioName = (currentUserDocument?.pioDataList?.toList() ??
+                                                                            [])
+                                                                        .toList()
+                                                                        .take(1)
+                                                                        .toList();
+                                                                    return Row(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: List.generate(
+                                                                          pioName
+                                                                              .length,
+                                                                          (pioNameIndex) {
+                                                                        final pioNameItem =
+                                                                            pioName[pioNameIndex];
+                                                                        return Visibility(
+                                                                          visible:
+                                                                              valueOrDefault<bool>(currentUserDocument?.pioVote, false) == true,
+                                                                          child:
+                                                                              Align(
+                                                                            alignment:
+                                                                                AlignmentDirectional(0.00, 0.00),
+                                                                            child:
+                                                                                Column(
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
@@ -2633,7 +2701,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   borderRadius: BorderRadius.circular(8.0),
                                                                                   child: Image.network(
                                                                                     valueOrDefault<String>(
-                                                                                      columnUsersRecord?.photoUrl,
+                                                                                      pioNameItem.photoUrl,
                                                                                       'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
                                                                                     ),
                                                                                     width: 100.0,
@@ -2642,7 +2710,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   ),
                                                                                 ),
                                                                                 GradientText(
-                                                                                  columnUsersRecord!.displayName,
+                                                                                  pioNameItem.displayName,
                                                                                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                                                         fontFamily: 'Readex Pro',
                                                                                         color: FlutterFlowTheme.of(context).info,
@@ -2655,12 +2723,13 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   gradientType: GradientType.linear,
                                                                                 ),
                                                                               ],
-                                                                            );
-                                                                          },
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                ],
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      }),
+                                                                    );
+                                                                  },
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -2708,80 +2777,85 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                               MainAxisAlignment
                                                                   .center,
                                                           children: [
-                                                            StreamBuilder<
-                                                                List<
-                                                                    UsersRecord>>(
-                                                              stream:
-                                                                  queryUsersRecord(
-                                                                queryBuilder: (usersRecord) =>
-                                                                    usersRecord.where(
-                                                                        'position',
-                                                                        isEqualTo:
-                                                                            'representative'),
-                                                              ),
-                                                              builder: (context,
-                                                                  snapshot) {
-                                                                // Customize what your widget looks like when it's loading.
-                                                                if (!snapshot
-                                                                    .hasData) {
-                                                                  return Center(
-                                                                    child:
-                                                                        SizedBox(
-                                                                      width:
-                                                                          50.0,
-                                                                      height:
-                                                                          50.0,
-                                                                      child:
-                                                                          CircularProgressIndicator(
-                                                                        valueColor:
-                                                                            AlwaysStoppedAnimation<Color>(
-                                                                          FlutterFlowTheme.of(context)
-                                                                              .primary,
-                                                                        ),
-                                                                      ),
+                                                            if ((valueOrDefault<
+                                                                            bool>(
+                                                                        currentUserDocument
+                                                                            ?.doneVote,
+                                                                        false) ==
+                                                                    false) &&
+                                                                (valueOrDefault<
+                                                                            bool>(
+                                                                        currentUserDocument
+                                                                            ?.repVote,
+                                                                        false) ==
+                                                                    false))
+                                                              AuthUserStreamWidget(
+                                                                builder: (context) =>
+                                                                    StreamBuilder<
+                                                                        List<
+                                                                            UsersRecord>>(
+                                                                  stream:
+                                                                      queryUsersRecord(
+                                                                    queryBuilder:
+                                                                        (usersRecord) =>
+                                                                            usersRecord.where(
+                                                                      'position',
+                                                                      isEqualTo:
+                                                                          'representative',
                                                                     ),
-                                                                  );
-                                                                }
-                                                                List<UsersRecord>
-                                                                    listViewMainUsersRecordList =
-                                                                    snapshot
-                                                                        .data!;
-                                                                return ListView
-                                                                    .separated(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
+                                                                  ),
+                                                                  builder: (context,
+                                                                      snapshot) {
+                                                                    // Customize what your widget looks like when it's loading.
+                                                                    if (!snapshot
+                                                                        .hasData) {
+                                                                      return Center(
+                                                                        child:
+                                                                            SizedBox(
+                                                                          width:
+                                                                              50.0,
+                                                                          height:
+                                                                              50.0,
+                                                                          child:
+                                                                              CircularProgressIndicator(
+                                                                            valueColor:
+                                                                                AlwaysStoppedAnimation<Color>(
+                                                                              FlutterFlowTheme.of(context).primary,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      );
+                                                                    }
+                                                                    List<UsersRecord>
+                                                                        listViewMainUsersRecordList =
+                                                                        snapshot
+                                                                            .data!;
+                                                                    return ListView
+                                                                        .separated(
+                                                                      padding: EdgeInsets.symmetric(
                                                                           horizontal:
                                                                               10.0),
-                                                                  shrinkWrap:
-                                                                      true,
-                                                                  scrollDirection:
-                                                                      Axis.horizontal,
-                                                                  itemCount:
-                                                                      listViewMainUsersRecordList
-                                                                          .length,
-                                                                  separatorBuilder: (_,
-                                                                          __) =>
-                                                                      SizedBox(
-                                                                          width:
-                                                                              10.0),
-                                                                  itemBuilder:
-                                                                      (context,
-                                                                          listViewMainIndex) {
-                                                                    final listViewMainUsersRecord =
-                                                                        listViewMainUsersRecordList[
-                                                                            listViewMainIndex];
-                                                                    return Row(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .max,
-                                                                      children: [
-                                                                        if ((valueOrDefault<bool>(currentUserDocument?.doneVote, false) ==
-                                                                                false) &&
-                                                                            (valueOrDefault<bool>(currentUserDocument?.repVote, false) ==
-                                                                                false))
-                                                                          AuthUserStreamWidget(
-                                                                            builder: (context) =>
-                                                                                InkWell(
+                                                                      shrinkWrap:
+                                                                          true,
+                                                                      scrollDirection:
+                                                                          Axis.horizontal,
+                                                                      itemCount:
+                                                                          listViewMainUsersRecordList
+                                                                              .length,
+                                                                      separatorBuilder: (_,
+                                                                              __) =>
+                                                                          SizedBox(
+                                                                              width: 10.0),
+                                                                      itemBuilder:
+                                                                          (context,
+                                                                              listViewMainIndex) {
+                                                                        final listViewMainUsersRecord =
+                                                                            listViewMainUsersRecordList[listViewMainIndex];
+                                                                        return Row(
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.max,
+                                                                          children: [
+                                                                            InkWell(
                                                                               splashColor: Colors.transparent,
                                                                               focusColor: Colors.transparent,
                                                                               hoverColor: Colors.transparent,
@@ -2803,17 +2877,51 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update(createUsersRecordData(
-                                                                                    repVote: true,
-                                                                                  ));
-                                                                                  setState(() {});
+                                                                                  if (functions.isNameInList(listViewMainUsersRecord.displayName, (currentUserDocument?.representativesList?.toList() ?? []).map((e) => e.displayName).toList())) {
+                                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                                      SnackBar(
+                                                                                        content: Text(
+                                                                                          'You already selected this person.',
+                                                                                          style: TextStyle(
+                                                                                            color: FlutterFlowTheme.of(context).primaryText,
+                                                                                          ),
+                                                                                        ),
+                                                                                        duration: Duration(milliseconds: 4000),
+                                                                                        backgroundColor: FlutterFlowTheme.of(context).secondary,
+                                                                                      ),
+                                                                                    );
+                                                                                  } else {
+                                                                                    await currentUserReference!.update({
+                                                                                      ...createUsersRecordData(
+                                                                                        repVote: true,
+                                                                                      ),
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'representativesList': FieldValue.arrayUnion([
+                                                                                            getRepsInfoFirestoreData(
+                                                                                              createRepsInfoStruct(
+                                                                                                photoUrl: listViewMainUsersRecord.photoUrl,
+                                                                                                displayName: listViewMainUsersRecord.displayName,
+                                                                                                clearUnsetFields: false,
+                                                                                              ),
+                                                                                              true,
+                                                                                            )
+                                                                                          ]),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
 
-                                                                                  await listViewMainUsersRecord.reference.update({
-                                                                                    'voteCount': FieldValue.increment(1),
-                                                                                  });
-                                                                                  setState(() {
-                                                                                    FFAppState().forRepsBoolean = true;
-                                                                                  });
+                                                                                    await listViewMainUsersRecord.reference.update({
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'voteCount': FieldValue.increment(1),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                    setState(() {
+                                                                                      FFAppState().forRepsBoolean = true;
+                                                                                    });
+                                                                                  }
                                                                                 }
                                                                               },
                                                                               child: Column(
@@ -2838,92 +2946,65 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                 ],
                                                                               ),
                                                                             ),
-                                                                          ),
-                                                                      ],
+                                                                          ],
+                                                                        );
+                                                                      },
                                                                     );
                                                                   },
-                                                                );
-                                                              },
-                                                            ),
-                                                            FutureBuilder<
-                                                                List<
-                                                                    UsersRecord>>(
-                                                              future:
-                                                                  queryUsersRecordOnce(
-                                                                queryBuilder: (usersRecord) =>
-                                                                    usersRecord.where(
-                                                                        'position',
-                                                                        isEqualTo:
-                                                                            'representative'),
-                                                                singleRecord:
-                                                                    true,
+                                                                ),
                                                               ),
-                                                              builder: (context,
-                                                                  snapshot) {
-                                                                // Customize what your widget looks like when it's loading.
-                                                                if (!snapshot
-                                                                    .hasData) {
-                                                                  return Center(
-                                                                    child:
+                                                            AuthUserStreamWidget(
+                                                              builder:
+                                                                  (context) =>
+                                                                      Builder(
+                                                                builder:
+                                                                    (context) {
+                                                                  final repsList = (currentUserDocument
+                                                                              ?.representativesList
+                                                                              ?.toList() ??
+                                                                          [])
+                                                                      .toList()
+                                                                      .take(6)
+                                                                      .toList();
+                                                                  return ListView
+                                                                      .separated(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        horizontal:
+                                                                            10.0),
+                                                                    shrinkWrap:
+                                                                        true,
+                                                                    scrollDirection:
+                                                                        Axis.horizontal,
+                                                                    itemCount:
+                                                                        repsList
+                                                                            .length,
+                                                                    separatorBuilder: (_,
+                                                                            __) =>
                                                                         SizedBox(
-                                                                      width:
-                                                                          50.0,
-                                                                      height:
-                                                                          50.0,
-                                                                      child:
-                                                                          CircularProgressIndicator(
-                                                                        valueColor:
-                                                                            AlwaysStoppedAnimation<Color>(
-                                                                          FlutterFlowTheme.of(context)
-                                                                              .primary,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  );
-                                                                }
-                                                                List<UsersRecord>
-                                                                    listView1UsersRecordList =
-                                                                    snapshot
-                                                                        .data!;
-                                                                // Return an empty Container when the item does not exist.
-                                                                if (snapshot
-                                                                    .data!
-                                                                    .isEmpty) {
-                                                                  return Container();
-                                                                }
-                                                                final listView1UsersRecord =
-                                                                    listView1UsersRecordList
-                                                                            .isNotEmpty
-                                                                        ? listView1UsersRecordList
-                                                                            .first
-                                                                        : null;
-                                                                return ListView(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          horizontal:
-                                                                              10.0),
-                                                                  shrinkWrap:
-                                                                      true,
-                                                                  scrollDirection:
-                                                                      Axis.horizontal,
-                                                                  children: [
-                                                                    Align(
-                                                                      alignment: AlignmentDirectional(
-                                                                          0.00,
-                                                                          0.00),
-                                                                      child:
-                                                                          Row(
-                                                                        mainAxisSize:
-                                                                            MainAxisSize.min,
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          if (valueOrDefault<bool>(currentUserDocument?.repVote, false) ==
-                                                                              true)
-                                                                            Align(
-                                                                              alignment: AlignmentDirectional(0.00, 0.00),
-                                                                              child: AuthUserStreamWidget(
-                                                                                builder: (context) => Column(
+                                                                            width:
+                                                                                10.0),
+                                                                    itemBuilder:
+                                                                        (context,
+                                                                            repsListIndex) {
+                                                                      final repsListItem =
+                                                                          repsList[
+                                                                              repsListIndex];
+                                                                      return Align(
+                                                                        alignment: AlignmentDirectional(
+                                                                            0.00,
+                                                                            0.00),
+                                                                        child:
+                                                                            Row(
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.min,
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: [
+                                                                            if (valueOrDefault<bool>(currentUserDocument?.repVote, false) ==
+                                                                                true)
+                                                                              Align(
+                                                                                alignment: AlignmentDirectional(0.00, 0.00),
+                                                                                child: Column(
                                                                                   mainAxisSize: MainAxisSize.min,
                                                                                   mainAxisAlignment: MainAxisAlignment.center,
                                                                                   children: [
@@ -2931,7 +3012,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                       borderRadius: BorderRadius.circular(8.0),
                                                                                       child: Image.network(
                                                                                         valueOrDefault<String>(
-                                                                                          listView1UsersRecord?.photoUrl,
+                                                                                          repsListItem.photoUrl,
                                                                                           'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
                                                                                         ),
                                                                                         width: 100.0,
@@ -2940,7 +3021,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                       ),
                                                                                     ),
                                                                                     GradientText(
-                                                                                      listView1UsersRecord!.displayName,
+                                                                                      repsListItem.displayName,
                                                                                       style: FlutterFlowTheme.of(context).bodyMedium.override(
                                                                                             fontFamily: 'Readex Pro',
                                                                                             color: FlutterFlowTheme.of(context).info,
@@ -2955,255 +3036,13 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                   ],
                                                                                 ),
                                                                               ),
-                                                                            ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ].divide(SizedBox(
-                                                                      width:
-                                                                          10.0)),
-                                                                );
-                                                              },
-                                                            ),
-                                                            FutureBuilder<
-                                                                List<
-                                                                    UsersRecord>>(
-                                                              future:
-                                                                  queryUsersRecordOnce(
-                                                                queryBuilder: (usersRecord) =>
-                                                                    usersRecord.where(
-                                                                        'position',
-                                                                        isEqualTo:
-                                                                            'representative'),
-                                                                singleRecord:
-                                                                    true,
-                                                              ),
-                                                              builder: (context,
-                                                                  snapshot) {
-                                                                // Customize what your widget looks like when it's loading.
-                                                                if (!snapshot
-                                                                    .hasData) {
-                                                                  return Center(
-                                                                    child:
-                                                                        SizedBox(
-                                                                      width:
-                                                                          50.0,
-                                                                      height:
-                                                                          50.0,
-                                                                      child:
-                                                                          CircularProgressIndicator(
-                                                                        valueColor:
-                                                                            AlwaysStoppedAnimation<Color>(
-                                                                          FlutterFlowTheme.of(context)
-                                                                              .primary,
+                                                                          ],
                                                                         ),
-                                                                      ),
-                                                                    ),
+                                                                      );
+                                                                    },
                                                                   );
-                                                                }
-                                                                List<UsersRecord>
-                                                                    listView2UsersRecordList =
-                                                                    snapshot
-                                                                        .data!;
-                                                                // Return an empty Container when the item does not exist.
-                                                                if (snapshot
-                                                                    .data!
-                                                                    .isEmpty) {
-                                                                  return Container();
-                                                                }
-                                                                final listView2UsersRecord =
-                                                                    listView2UsersRecordList
-                                                                            .isNotEmpty
-                                                                        ? listView2UsersRecordList
-                                                                            .first
-                                                                        : null;
-                                                                return ListView(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          horizontal:
-                                                                              10.0),
-                                                                  shrinkWrap:
-                                                                      true,
-                                                                  scrollDirection:
-                                                                      Axis.horizontal,
-                                                                  children: [
-                                                                    Align(
-                                                                      alignment: AlignmentDirectional(
-                                                                          0.00,
-                                                                          0.00),
-                                                                      child:
-                                                                          Row(
-                                                                        mainAxisSize:
-                                                                            MainAxisSize.min,
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          if (valueOrDefault<bool>(currentUserDocument?.repVote, false) ==
-                                                                              true)
-                                                                            Align(
-                                                                              alignment: AlignmentDirectional(0.00, 0.00),
-                                                                              child: AuthUserStreamWidget(
-                                                                                builder: (context) => Column(
-                                                                                  mainAxisSize: MainAxisSize.min,
-                                                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                                                  children: [
-                                                                                    ClipRRect(
-                                                                                      borderRadius: BorderRadius.circular(8.0),
-                                                                                      child: Image.network(
-                                                                                        valueOrDefault<String>(
-                                                                                          listView2UsersRecord?.photoUrl,
-                                                                                          'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
-                                                                                        ),
-                                                                                        width: 100.0,
-                                                                                        height: 100.0,
-                                                                                        fit: BoxFit.cover,
-                                                                                      ),
-                                                                                    ),
-                                                                                    GradientText(
-                                                                                      listView2UsersRecord!.displayName,
-                                                                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                            fontFamily: 'Readex Pro',
-                                                                                            color: FlutterFlowTheme.of(context).info,
-                                                                                          ),
-                                                                                      colors: [
-                                                                                        FlutterFlowTheme.of(context).primary,
-                                                                                        FlutterFlowTheme.of(context).secondary
-                                                                                      ],
-                                                                                      gradientDirection: GradientDirection.ltr,
-                                                                                      gradientType: GradientType.linear,
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ].divide(SizedBox(
-                                                                      width:
-                                                                          10.0)),
-                                                                );
-                                                              },
-                                                            ),
-                                                            FutureBuilder<
-                                                                List<
-                                                                    UsersRecord>>(
-                                                              future:
-                                                                  queryUsersRecordOnce(
-                                                                queryBuilder: (usersRecord) =>
-                                                                    usersRecord.where(
-                                                                        'position',
-                                                                        isEqualTo:
-                                                                            'representative'),
-                                                                singleRecord:
-                                                                    true,
+                                                                },
                                                               ),
-                                                              builder: (context,
-                                                                  snapshot) {
-                                                                // Customize what your widget looks like when it's loading.
-                                                                if (!snapshot
-                                                                    .hasData) {
-                                                                  return Center(
-                                                                    child:
-                                                                        SizedBox(
-                                                                      width:
-                                                                          50.0,
-                                                                      height:
-                                                                          50.0,
-                                                                      child:
-                                                                          CircularProgressIndicator(
-                                                                        valueColor:
-                                                                            AlwaysStoppedAnimation<Color>(
-                                                                          FlutterFlowTheme.of(context)
-                                                                              .primary,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  );
-                                                                }
-                                                                List<UsersRecord>
-                                                                    listView3UsersRecordList =
-                                                                    snapshot
-                                                                        .data!;
-                                                                // Return an empty Container when the item does not exist.
-                                                                if (snapshot
-                                                                    .data!
-                                                                    .isEmpty) {
-                                                                  return Container();
-                                                                }
-                                                                final listView3UsersRecord =
-                                                                    listView3UsersRecordList
-                                                                            .isNotEmpty
-                                                                        ? listView3UsersRecordList
-                                                                            .first
-                                                                        : null;
-                                                                return ListView(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          horizontal:
-                                                                              10.0),
-                                                                  shrinkWrap:
-                                                                      true,
-                                                                  scrollDirection:
-                                                                      Axis.horizontal,
-                                                                  children: [
-                                                                    Align(
-                                                                      alignment: AlignmentDirectional(
-                                                                          0.00,
-                                                                          0.00),
-                                                                      child:
-                                                                          Row(
-                                                                        mainAxisSize:
-                                                                            MainAxisSize.min,
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          if (valueOrDefault<bool>(currentUserDocument?.repVote, false) ==
-                                                                              true)
-                                                                            Align(
-                                                                              alignment: AlignmentDirectional(0.00, 0.00),
-                                                                              child: AuthUserStreamWidget(
-                                                                                builder: (context) => Column(
-                                                                                  mainAxisSize: MainAxisSize.min,
-                                                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                                                  children: [
-                                                                                    ClipRRect(
-                                                                                      borderRadius: BorderRadius.circular(8.0),
-                                                                                      child: Image.network(
-                                                                                        valueOrDefault<String>(
-                                                                                          listView3UsersRecord?.photoUrl,
-                                                                                          'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
-                                                                                        ),
-                                                                                        width: 100.0,
-                                                                                        height: 100.0,
-                                                                                        fit: BoxFit.cover,
-                                                                                      ),
-                                                                                    ),
-                                                                                    GradientText(
-                                                                                      listView3UsersRecord!.displayName,
-                                                                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                            fontFamily: 'Readex Pro',
-                                                                                            color: FlutterFlowTheme.of(context).info,
-                                                                                          ),
-                                                                                      colors: [
-                                                                                        FlutterFlowTheme.of(context).primary,
-                                                                                        FlutterFlowTheme.of(context).secondary
-                                                                                      ],
-                                                                                      gradientDirection: GradientDirection.ltr,
-                                                                                      gradientType: GradientType.linear,
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ].divide(SizedBox(
-                                                                      width:
-                                                                          10.0)),
-                                                                );
-                                                              },
                                                             ),
                                                           ],
                                                         ),
@@ -3222,66 +3061,45 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                               ?.repVote,
                                                           false) ==
                                                       true) &&
-                                                  (FFAppState().RepsUptoMax ==
-                                                      6))
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          0.0, 0.0, 0.0, 30.0),
-                                                  child: AuthUserStreamWidget(
-                                                    builder: (context) =>
-                                                        FFButtonWidget(
-                                                      onPressed: () async {
-                                                        await currentUserReference!
-                                                            .update(
-                                                                createUsersRecordData(
-                                                          repVote: false,
-                                                        ));
-                                                        setState(() {});
-                                                      },
-                                                      text:
-                                                          'Add Representative',
-                                                      options: FFButtonOptions(
-                                                        height: 40.0,
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    24.0,
-                                                                    0.0,
-                                                                    24.0,
-                                                                    0.0),
-                                                        iconPadding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0),
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primary,
-                                                        textStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .titleSmall
-                                                                .override(
-                                                                  fontFamily:
-                                                                      'Readex Pro',
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                        elevation: 3.0,
-                                                        borderSide: BorderSide(
-                                                          color: Colors
-                                                              .transparent,
-                                                          width: 1.0,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.0),
-                                                      ),
+                                                  ((currentUserDocument
+                                                                  ?.representativesList
+                                                                  ?.toList() ??
+                                                              [])
+                                                          .length !=
+                                                      FFAppState()
+                                                          .RepresentativeMaxLimit))
+                                                AuthUserStreamWidget(
+                                                  builder: (context) =>
+                                                      FlutterFlowIconButton(
+                                                    borderColor:
+                                                        Color(0xB2262D34),
+                                                    borderRadius: 20.0,
+                                                    borderWidth: 1.0,
+                                                    buttonSize: 40.0,
+                                                    fillColor:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .accent1,
+                                                    icon: Icon(
+                                                      Icons.add,
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primaryText,
+                                                      size: 24.0,
                                                     ),
+                                                    onPressed: () async {
+                                                      await currentUserReference!
+                                                          .update(
+                                                              createUsersRecordData(
+                                                        repVote: false,
+                                                      ));
+                                                      setState(() {
+                                                        FFAppState()
+                                                                .forRepsBoolean =
+                                                            false;
+                                                      });
+                                                    },
                                                   ),
                                                 ),
                                               if ((valueOrDefault<bool>(currentUserDocument?.presVote, false) == true) &&
@@ -3323,27 +3141,6 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                     builder: (context) =>
                                                         FFButtonWidget(
                                                       onPressed: () async {
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          SnackBar(
-                                                            content: Text(
-                                                              'Submitting...',
-                                                              style: TextStyle(
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .primaryText,
-                                                              ),
-                                                            ),
-                                                            duration: Duration(
-                                                                milliseconds:
-                                                                    1000),
-                                                            backgroundColor:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondary,
-                                                          ),
-                                                        );
                                                         if (valueOrDefault<
                                                                     bool>(
                                                                 currentUserDocument
@@ -3355,7 +3152,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                               .showSnackBar(
                                                             SnackBar(
                                                               content: Text(
-                                                                'You have Marked as Done',
+                                                                'You already voted.',
                                                                 style:
                                                                     TextStyle(
                                                                   color: FlutterFlowTheme.of(
@@ -3373,6 +3170,29 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                             ),
                                                           );
                                                         } else {
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            SnackBar(
+                                                              content: Text(
+                                                                'Submitting...',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .primaryText,
+                                                                ),
+                                                              ),
+                                                              duration: Duration(
+                                                                  milliseconds:
+                                                                      1000),
+                                                              backgroundColor:
+                                                                  FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .secondary,
+                                                            ),
+                                                          );
+
                                                           await currentUserReference!
                                                               .update(
                                                                   createUsersRecordData(

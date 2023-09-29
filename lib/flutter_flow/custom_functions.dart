@@ -29,3 +29,34 @@ String? newCustomFunction(String email) {
     return "Registration failed: $e";
   }
 }
+
+bool isNameInList(
+  String? nameToCheck,
+  List<String>? nameList,
+) {
+  if (nameToCheck == null || nameList!.isEmpty) {
+    return false;
+  }
+  return nameList.contains(nameToCheck);
+}
+
+String isValueExist(
+  DocumentReference? names,
+  RepsInfoStruct? repsList,
+) {
+  // function that checks if a value exists in a list
+  if (repsList == null || names == null) {
+    return 'false';
+  }
+  return repsList.toMap().containsValue(names) ? 'true' : 'false';
+}
+
+int forTimer(
+  DateTime? startTimer,
+  DateTime? currentTime,
+) {
+  // calculate the difference between the start and end times in hours
+  final difference = currentTime!.difference(startTimer!);
+  final hours = difference.inHours;
+  return hours;
+}

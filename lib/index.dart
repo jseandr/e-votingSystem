@@ -17,3 +17,5 @@ export '/student_view/student_voting/student_voting_widget.dart'
 export '/student_view/student_dashboard/student_dashboard_widget.dart'
     show StudentDashboardWidget;
 export '/admin_view/admin_list/admin_list_widget.dart' show AdminListWidget;
+export '/admin_view/admin_dashboard/admin_dashboard_widget.dart'
+    show AdminDashboardWidget;

@@ -43,7 +43,9 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
     context.watch<FFAppState>();
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(_model.unfocusNode),
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
@@ -188,7 +190,7 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
                                   'adminHome',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -255,7 +257,74 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
+                                  'adminDashboard',
+                                  extra: <String, dynamic>{
+                                    kTransitionInfoKey: TransitionInfo(
+                                      hasTransition: true,
+                                      transitionType: PageTransitionType.fade,
+                                      duration: Duration(milliseconds: 0),
+                                    ),
+                                  },
+                                );
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                height: 60.0,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 16.0, 0.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            12.0, 0.0, 12.0, 0.0),
+                                        child: Icon(
+                                          Icons.dashboard,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primaryBackground,
+                                          size: 35.0,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            14.0, 0.0, 0.0, 0.0),
+                                        child: Text(
+                                          'Dashboard',
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                fontFamily: 'Readex Pro',
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primaryBackground,
+                                                fontSize: 22.0,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                12.0, 0.0, 12.0, 0.0),
+                            child: InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                context.pushNamed(
                                   'adminInsert',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -315,7 +384,7 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
                                   'adminList',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -375,7 +444,7 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
                                   'adminUsers',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -488,10 +557,111 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                               ),
                             ),
                           ),
-                          Divider(
-                            height: 48.0,
-                            thickness: 1.0,
-                            color: Color(0xFF95A1AC),
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                0.0, 10.0, 0.0, 0.0),
+                            child: StreamBuilder<List<UsersRecord>>(
+                              stream: queryUsersRecord(
+                                singleRecord: true,
+                              ),
+                              builder: (context, snapshot) {
+                                // Customize what your widget looks like when it's loading.
+                                if (!snapshot.hasData) {
+                                  return Center(
+                                    child: SizedBox(
+                                      width: 50.0,
+                                      height: 50.0,
+                                      child: CircularProgressIndicator(
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                          FlutterFlowTheme.of(context).primary,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                List<UsersRecord> rowUsersRecordList =
+                                    snapshot.data!;
+                                // Return an empty Container when the item does not exist.
+                                if (snapshot.data!.isEmpty) {
+                                  return Container();
+                                }
+                                final rowUsersRecord =
+                                    rowUsersRecordList.isNotEmpty
+                                        ? rowUsersRecordList.first
+                                        : null;
+                                return Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    FFButtonWidget(
+                                      onPressed: () async {
+                                        await rowUsersRecord!.reference
+                                            .update(createUsersRecordData(
+                                          readyToVote: true,
+                                        ));
+                                      },
+                                      text: 'On Voting',
+                                      options: FFButtonOptions(
+                                        height: 40.0,
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            24.0, 0.0, 24.0, 0.0),
+                                        iconPadding:
+                                            EdgeInsetsDirectional.fromSTEB(
+                                                0.0, 0.0, 0.0, 0.0),
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
+                                        textStyle: FlutterFlowTheme.of(context)
+                                            .titleSmall
+                                            .override(
+                                              fontFamily: 'Readex Pro',
+                                              color: Colors.white,
+                                            ),
+                                        elevation: 3.0,
+                                        borderSide: BorderSide(
+                                          color: Colors.transparent,
+                                          width: 1.0,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                    FFButtonWidget(
+                                      onPressed: () async {
+                                        await rowUsersRecord!.reference
+                                            .update(createUsersRecordData(
+                                          readyToVote: false,
+                                        ));
+                                      },
+                                      text: 'Off Voting',
+                                      options: FFButtonOptions(
+                                        height: 40.0,
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            24.0, 0.0, 24.0, 0.0),
+                                        iconPadding:
+                                            EdgeInsetsDirectional.fromSTEB(
+                                                0.0, 0.0, 0.0, 0.0),
+                                        color: Color(0xFFFF0000),
+                                        textStyle: FlutterFlowTheme.of(context)
+                                            .titleSmall
+                                            .override(
+                                              fontFamily: 'Readex Pro',
+                                              color: Colors.white,
+                                            ),
+                                        elevation: 3.0,
+                                        borderSide: BorderSide(
+                                          color: Colors.transparent,
+                                          width: 1.0,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                           ),
                           Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
@@ -713,12 +883,18 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                                         children: [
                                           FFButtonWidget(
                                             onPressed: () async {
-                                              if (currentUserPhoto != '') {
+                                              if (currentUserPhoto == '') {
+                                                await FirebaseStorage.instance
+                                                    .refFromURL(
+                                                        currentUserPhoto)
+                                                    .delete();
+                                              } else {
                                                 await FirebaseStorage.instance
                                                     .refFromURL(
                                                         currentUserPhoto)
                                                     .delete();
                                               }
+
                                               final selectedMedia =
                                                   await selectMediaWithSourceBottomSheet(
                                                 context: context,

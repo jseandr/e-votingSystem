@@ -56,7 +56,9 @@ class _LoginpageWidgetState extends State<LoginpageWidget>
     context.watch<FFAppState>();
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(_model.unfocusNode),
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: Color(0xFF14181B),
@@ -345,12 +347,17 @@ class _LoginpageWidgetState extends State<LoginpageWidget>
                                                           context: context,
                                                           builder: (context) {
                                                             return GestureDetector(
-                                                              onTap: () => FocusScope
-                                                                      .of(
+                                                              onTap: () => _model
+                                                                      .unfocusNode
+                                                                      .canRequestFocus
+                                                                  ? FocusScope.of(
                                                                           context)
-                                                                  .requestFocus(
-                                                                      _model
-                                                                          .unfocusNode),
+                                                                      .requestFocus(
+                                                                          _model
+                                                                              .unfocusNode)
+                                                                  : FocusScope.of(
+                                                                          context)
+                                                                      .unfocus(),
                                                               child: Padding(
                                                                 padding: MediaQuery
                                                                     .viewInsetsOf(
@@ -623,10 +630,16 @@ class _LoginpageWidgetState extends State<LoginpageWidget>
                                                     context: context,
                                                     builder: (context) {
                                                       return GestureDetector(
-                                                        onTap: () => FocusScope
-                                                                .of(context)
-                                                            .requestFocus(_model
-                                                                .unfocusNode),
+                                                        onTap: () => _model
+                                                                .unfocusNode
+                                                                .canRequestFocus
+                                                            ? FocusScope.of(
+                                                                    context)
+                                                                .requestFocus(_model
+                                                                    .unfocusNode)
+                                                            : FocusScope.of(
+                                                                    context)
+                                                                .unfocus(),
                                                         child: Padding(
                                                           padding: MediaQuery
                                                               .viewInsetsOf(
@@ -1336,11 +1349,16 @@ class _LoginpageWidgetState extends State<LoginpageWidget>
                                                           memberStatus:
                                                               'student',
                                                           voteFirst: true,
-                                                          readyToVote: true,
+                                                          readyToVote: false,
                                                           isVerified: false,
                                                         ),
-                                                        'created_time': FieldValue
-                                                            .serverTimestamp(),
+                                                        ...mapToFirestore(
+                                                          {
+                                                            'created_time':
+                                                                FieldValue
+                                                                    .serverTimestamp(),
+                                                          },
+                                                        ),
                                                       });
 
                                                       _navigate = () =>
@@ -1655,11 +1673,15 @@ class _LoginpageWidgetState extends State<LoginpageWidget>
                                                       .text,
                                                   memberStatus: 'student',
                                                   voteFirst: true,
-                                                  readyToVote: true,
+                                                  readyToVote: false,
                                                   isVerified: false,
                                                 ),
-                                                'created_time': FieldValue
-                                                    .serverTimestamp(),
+                                                ...mapToFirestore(
+                                                  {
+                                                    'created_time': FieldValue
+                                                        .serverTimestamp(),
+                                                  },
+                                                ),
                                               });
 
                                               _navigate = () =>

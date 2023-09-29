@@ -27,12 +27,36 @@ class FFAppState extends ChangeNotifier {
               _candidateSwitcherPersisted;
     });
     await _safeInitAsync(() async {
-      _RepsUptoMax =
-          await secureStorage.getInt('ff_RepsUptoMax') ?? _RepsUptoMax;
-    });
-    await _safeInitAsync(() async {
       _forRepsBoolean =
           await secureStorage.getBool('ff_forRepsBoolean') ?? _forRepsBoolean;
+    });
+    await _safeInitAsync(() async {
+      _RepresentativeMaxLimit =
+          await secureStorage.getInt('ff_RepresentativeMaxLimit') ??
+              _RepresentativeMaxLimit;
+    });
+    await _safeInitAsync(() async {
+      if (await secureStorage.read(key: 'ff_User') != null) {
+        try {
+          final serializedData =
+              await secureStorage.getString('ff_User') ?? '{}';
+          _User =
+              RepsInfoStruct.fromSerializableMap(jsonDecode(serializedData));
+        } catch (e) {
+          print("Can't decode persisted data type. Error: $e.");
+        }
+      }
+    });
+    await _safeInitAsync(() async {
+      _isRepresentativeSelected =
+          await secureStorage.getBool('ff_isRepresentativeSelected') ??
+              _isRepresentativeSelected;
+    });
+    await _safeInitAsync(() async {
+      _timerAppState = await secureStorage.read(key: 'ff_timerAppState') != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              (await secureStorage.getInt('ff_timerAppState'))!)
+          : _timerAppState;
     });
   }
 
@@ -108,17 +132,6 @@ class FFAppState extends ChangeNotifier {
     secureStorage.delete(key: 'ff_candidateSwitcherPersisted');
   }
 
-  int _RepsUptoMax = 6;
-  int get RepsUptoMax => _RepsUptoMax;
-  set RepsUptoMax(int _value) {
-    _RepsUptoMax = _value;
-    secureStorage.setInt('ff_RepsUptoMax', _value);
-  }
-
-  void deleteRepsUptoMax() {
-    secureStorage.delete(key: 'ff_RepsUptoMax');
-  }
-
   bool _forRepsBoolean = false;
   bool get forRepsBoolean => _forRepsBoolean;
   set forRepsBoolean(bool _value) {
@@ -128,6 +141,58 @@ class FFAppState extends ChangeNotifier {
 
   void deleteForRepsBoolean() {
     secureStorage.delete(key: 'ff_forRepsBoolean');
+  }
+
+  int _RepresentativeMaxLimit = 6;
+  int get RepresentativeMaxLimit => _RepresentativeMaxLimit;
+  set RepresentativeMaxLimit(int _value) {
+    _RepresentativeMaxLimit = _value;
+    secureStorage.setInt('ff_RepresentativeMaxLimit', _value);
+  }
+
+  void deleteRepresentativeMaxLimit() {
+    secureStorage.delete(key: 'ff_RepresentativeMaxLimit');
+  }
+
+  RepsInfoStruct _User = RepsInfoStruct();
+  RepsInfoStruct get User => _User;
+  set User(RepsInfoStruct _value) {
+    _User = _value;
+    secureStorage.setString('ff_User', _value.serialize());
+  }
+
+  void deleteUser() {
+    secureStorage.delete(key: 'ff_User');
+  }
+
+  void updateUserStruct(Function(RepsInfoStruct) updateFn) {
+    updateFn(_User);
+    secureStorage.setString('ff_User', _User.serialize());
+  }
+
+  bool _isRepresentativeSelected = false;
+  bool get isRepresentativeSelected => _isRepresentativeSelected;
+  set isRepresentativeSelected(bool _value) {
+    _isRepresentativeSelected = _value;
+    secureStorage.setBool('ff_isRepresentativeSelected', _value);
+  }
+
+  void deleteIsRepresentativeSelected() {
+    secureStorage.delete(key: 'ff_isRepresentativeSelected');
+  }
+
+  DateTime? _timerAppState = DateTime.fromMillisecondsSinceEpoch(1695948000000);
+  DateTime? get timerAppState => _timerAppState;
+  set timerAppState(DateTime? _value) {
+    _timerAppState = _value;
+    _value != null
+        ? secureStorage.setInt(
+            'ff_timerAppState', _value.millisecondsSinceEpoch)
+        : secureStorage.remove('ff_timerAppState');
+  }
+
+  void deleteTimerAppState() {
+    secureStorage.delete(key: 'ff_timerAppState');
   }
 }
 

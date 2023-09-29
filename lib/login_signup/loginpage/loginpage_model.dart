@@ -5,12 +5,13 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/login_signup/resendemail/resendemail_widget.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
+import 'loginpage_widget.dart' show LoginpageWidget;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class LoginpageModel extends FlutterFlowModel {
+class LoginpageModel extends FlutterFlowModel<LoginpageWidget> {
   ///  State fields for stateful widgets in this page.
 
   final unfocusNode = FocusNode();

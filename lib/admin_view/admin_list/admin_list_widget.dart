@@ -41,7 +41,9 @@ class _AdminListWidgetState extends State<AdminListWidget> {
     context.watch<FFAppState>();
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(_model.unfocusNode),
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
@@ -186,7 +188,7 @@ class _AdminListWidgetState extends State<AdminListWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
                                   'adminHome',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -253,7 +255,74 @@ class _AdminListWidgetState extends State<AdminListWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
+                                  'adminDashboard',
+                                  extra: <String, dynamic>{
+                                    kTransitionInfoKey: TransitionInfo(
+                                      hasTransition: true,
+                                      transitionType: PageTransitionType.fade,
+                                      duration: Duration(milliseconds: 0),
+                                    ),
+                                  },
+                                );
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                height: 60.0,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 16.0, 0.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            12.0, 0.0, 12.0, 0.0),
+                                        child: Icon(
+                                          Icons.dashboard,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primaryBackground,
+                                          size: 35.0,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            14.0, 0.0, 0.0, 0.0),
+                                        child: Text(
+                                          'Dashboard',
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                fontFamily: 'Readex Pro',
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primaryBackground,
+                                                fontSize: 22.0,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                12.0, 0.0, 12.0, 0.0),
+                            child: InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                context.pushNamed(
                                   'adminInsert',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -383,7 +452,7 @@ class _AdminListWidgetState extends State<AdminListWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.goNamed(
+                                context.pushNamed(
                                   'adminUsers',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
@@ -440,7 +509,7 @@ class _AdminListWidgetState extends State<AdminListWidget> {
                             hoverColor: Colors.transparent,
                             highlightColor: Colors.transparent,
                             onTap: () async {
-                              context.goNamed(
+                              context.pushNamed(
                                 'adminSetting',
                                 extra: <String, dynamic>{
                                   kTransitionInfoKey: TransitionInfo(
@@ -490,10 +559,111 @@ class _AdminListWidgetState extends State<AdminListWidget> {
                               ),
                             ),
                           ),
-                          Divider(
-                            height: 48.0,
-                            thickness: 1.0,
-                            color: Color(0xFF95A1AC),
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                0.0, 10.0, 0.0, 0.0),
+                            child: StreamBuilder<List<UsersRecord>>(
+                              stream: queryUsersRecord(
+                                singleRecord: true,
+                              ),
+                              builder: (context, snapshot) {
+                                // Customize what your widget looks like when it's loading.
+                                if (!snapshot.hasData) {
+                                  return Center(
+                                    child: SizedBox(
+                                      width: 50.0,
+                                      height: 50.0,
+                                      child: CircularProgressIndicator(
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                          FlutterFlowTheme.of(context).primary,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                List<UsersRecord> rowUsersRecordList =
+                                    snapshot.data!;
+                                // Return an empty Container when the item does not exist.
+                                if (snapshot.data!.isEmpty) {
+                                  return Container();
+                                }
+                                final rowUsersRecord =
+                                    rowUsersRecordList.isNotEmpty
+                                        ? rowUsersRecordList.first
+                                        : null;
+                                return Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    FFButtonWidget(
+                                      onPressed: () async {
+                                        await rowUsersRecord!.reference
+                                            .update(createUsersRecordData(
+                                          readyToVote: true,
+                                        ));
+                                      },
+                                      text: 'On Voting',
+                                      options: FFButtonOptions(
+                                        height: 40.0,
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            24.0, 0.0, 24.0, 0.0),
+                                        iconPadding:
+                                            EdgeInsetsDirectional.fromSTEB(
+                                                0.0, 0.0, 0.0, 0.0),
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
+                                        textStyle: FlutterFlowTheme.of(context)
+                                            .titleSmall
+                                            .override(
+                                              fontFamily: 'Readex Pro',
+                                              color: Colors.white,
+                                            ),
+                                        elevation: 3.0,
+                                        borderSide: BorderSide(
+                                          color: Colors.transparent,
+                                          width: 1.0,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                    FFButtonWidget(
+                                      onPressed: () async {
+                                        await rowUsersRecord!.reference
+                                            .update(createUsersRecordData(
+                                          readyToVote: false,
+                                        ));
+                                      },
+                                      text: 'Off Voting',
+                                      options: FFButtonOptions(
+                                        height: 40.0,
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            24.0, 0.0, 24.0, 0.0),
+                                        iconPadding:
+                                            EdgeInsetsDirectional.fromSTEB(
+                                                0.0, 0.0, 0.0, 0.0),
+                                        color: Color(0xFFFF0000),
+                                        textStyle: FlutterFlowTheme.of(context)
+                                            .titleSmall
+                                            .override(
+                                              fontFamily: 'Readex Pro',
+                                              color: Colors.white,
+                                            ),
+                                        elevation: 3.0,
+                                        borderSide: BorderSide(
+                                          color: Colors.transparent,
+                                          width: 1.0,
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                           ),
                           Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
@@ -701,1319 +871,1375 @@ class _AdminListWidgetState extends State<AdminListWidget> {
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
                                                     0.0, 0.0, 30.0, 0.0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  'PRESIDENT',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .titleLarge
-                                                      .override(
-                                                        fontFamily: 'Outfit',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .warning,
-                                                      ),
-                                                ),
-                                                Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    FutureBuilder<
-                                                        List<UsersRecord>>(
-                                                      future:
-                                                          queryUsersRecordOnce(
-                                                        queryBuilder: (usersRecord) =>
-                                                            usersRecord.where(
-                                                                'position',
-                                                                isEqualTo:
-                                                                    'president'),
-                                                      ),
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        // Customize what your widget looks like when it's loading.
-                                                        if (!snapshot.hasData) {
-                                                          return Center(
-                                                            child: SizedBox(
-                                                              width: 50.0,
-                                                              height: 50.0,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                valueColor:
-                                                                    AlwaysStoppedAnimation<
-                                                                        Color>(
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primary,
-                                                                ),
-                                                              ),
+                                            child: SingleChildScrollView(
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    'PRESIDENT',
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .titleLarge
+                                                        .override(
+                                                          fontFamily: 'Outfit',
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .warning,
+                                                        ),
+                                                  ),
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Container(
+                                                        width: double.infinity,
+                                                        decoration:
+                                                            BoxDecoration(),
+                                                        child: FutureBuilder<
+                                                            List<UsersRecord>>(
+                                                          future:
+                                                              queryUsersRecordOnce(
+                                                            queryBuilder:
+                                                                (usersRecord) =>
+                                                                    usersRecord
+                                                                        .where(
+                                                              'position',
+                                                              isEqualTo:
+                                                                  'president',
                                                             ),
-                                                          );
-                                                        }
-                                                        List<UsersRecord>
-                                                            listViewUsersRecordList =
-                                                            snapshot.data!;
-                                                        return ListView
-                                                            .separated(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical:
-                                                                      10.0),
-                                                          shrinkWrap: true,
-                                                          scrollDirection:
-                                                              Axis.vertical,
-                                                          itemCount:
-                                                              listViewUsersRecordList
-                                                                  .length,
-                                                          separatorBuilder: (_,
-                                                                  __) =>
-                                                              SizedBox(
-                                                                  height: 10.0),
-                                                          itemBuilder: (context,
-                                                              listViewIndex) {
-                                                            final listViewUsersRecord =
-                                                                listViewUsersRecordList[
-                                                                    listViewIndex];
-                                                            return Slidable(
-                                                              endActionPane:
-                                                                  ActionPane(
-                                                                motion:
-                                                                    const ScrollMotion(),
-                                                                extentRatio:
-                                                                    0.25,
-                                                                children: [
-                                                                  SlidableAction(
-                                                                    label:
-                                                                        'Delete',
-                                                                    backgroundColor:
-                                                                        Color(
-                                                                            0xFFFF0000),
-                                                                    icon: Icons
-                                                                        .delete,
-                                                                    onPressed:
-                                                                        (_) async {
-                                                                      await listViewUsersRecord
-                                                                          .reference
-                                                                          .update({
-                                                                        ...createUsersRecordData(
-                                                                          isCandidate:
-                                                                              false,
-                                                                          voteCount:
-                                                                              0,
-                                                                        ),
-                                                                        'position':
-                                                                            FieldValue.delete(),
-                                                                      });
-                                                                      ScaffoldMessenger.of(
+                                                          ),
+                                                          builder: (context,
+                                                              snapshot) {
+                                                            // Customize what your widget looks like when it's loading.
+                                                            if (!snapshot
+                                                                .hasData) {
+                                                              return Center(
+                                                                child: SizedBox(
+                                                                  width: 50.0,
+                                                                  height: 50.0,
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                    valueColor:
+                                                                        AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                      FlutterFlowTheme.of(
                                                                               context)
-                                                                          .showSnackBar(
-                                                                        SnackBar(
-                                                                          content:
-                                                                              Text(
-                                                                            'Successfully deleted!',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: FlutterFlowTheme.of(context).primaryText,
-                                                                            ),
-                                                                          ),
-                                                                          duration:
-                                                                              Duration(milliseconds: 500),
-                                                                          backgroundColor:
-                                                                              FlutterFlowTheme.of(context).secondary,
-                                                                        ),
-                                                                      );
-                                                                      FFAppState()
-                                                                          .update(
-                                                                              () {});
-                                                                    },
+                                                                          .primary,
+                                                                    ),
                                                                   ),
-                                                                ],
-                                                              ),
-                                                              child: ListTile(
-                                                                title: Text(
-                                                                  listViewUsersRecord
-                                                                      .displayName,
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .titleLarge
-                                                                      .override(
-                                                                        fontFamily:
-                                                                            'Outfit',
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .info,
-                                                                        fontSize:
-                                                                            18.0,
+                                                                ),
+                                                              );
+                                                            }
+                                                            List<UsersRecord>
+                                                                listViewUsersRecordList =
+                                                                snapshot.data!;
+                                                            return ListView
+                                                                .separated(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          10.0),
+                                                              primary: false,
+                                                              shrinkWrap: true,
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              itemCount:
+                                                                  listViewUsersRecordList
+                                                                      .length,
+                                                              separatorBuilder: (_,
+                                                                      __) =>
+                                                                  SizedBox(
+                                                                      height:
+                                                                          10.0),
+                                                              itemBuilder: (context,
+                                                                  listViewIndex) {
+                                                                final listViewUsersRecord =
+                                                                    listViewUsersRecordList[
+                                                                        listViewIndex];
+                                                                return Container(
+                                                                  width: 100.0,
+                                                                  height: 60.0,
+                                                                  decoration:
+                                                                      BoxDecoration(),
+                                                                  child:
+                                                                      Slidable(
+                                                                    endActionPane:
+                                                                        ActionPane(
+                                                                      motion:
+                                                                          const ScrollMotion(),
+                                                                      extentRatio:
+                                                                          0.25,
+                                                                      children: [
+                                                                        SlidableAction(
+                                                                          label:
+                                                                              'Delete',
+                                                                          backgroundColor:
+                                                                              Color(0xFFFF0000),
+                                                                          icon:
+                                                                              Icons.delete,
+                                                                          onPressed:
+                                                                              (_) async {
+                                                                            await listViewUsersRecord.reference.update({
+                                                                              ...createUsersRecordData(
+                                                                                isCandidate: false,
+                                                                                voteCount: 0,
+                                                                              ),
+                                                                              ...mapToFirestore(
+                                                                                {
+                                                                                  'position': FieldValue.delete(),
+                                                                                },
+                                                                              ),
+                                                                            });
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Text(
+                                                                                  'Successfully deleted!',
+                                                                                  style: TextStyle(
+                                                                                    color: FlutterFlowTheme.of(context).primaryText,
+                                                                                  ),
+                                                                                ),
+                                                                                duration: Duration(milliseconds: 500),
+                                                                                backgroundColor: FlutterFlowTheme.of(context).secondary,
+                                                                              ),
+                                                                            );
+                                                                            FFAppState().update(() {});
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    child:
+                                                                        ListTile(
+                                                                      title:
+                                                                          Text(
+                                                                        listViewUsersRecord
+                                                                            .displayName,
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .titleLarge
+                                                                            .override(
+                                                                              fontFamily: 'Outfit',
+                                                                              color: FlutterFlowTheme.of(context).info,
+                                                                              fontSize: 18.0,
+                                                                            ),
                                                                       ),
-                                                                ),
-                                                                trailing: Icon(
-                                                                  Icons
-                                                                      .arrow_forward_ios,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  size: 20.0,
-                                                                ),
-                                                                tileColor: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryBackground,
-                                                                dense: false,
-                                                              ),
+                                                                      trailing:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_forward_ios,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .secondaryText,
+                                                                        size:
+                                                                            20.0,
+                                                                      ),
+                                                                      tileColor:
+                                                                          FlutterFlowTheme.of(context)
+                                                                              .secondaryBackground,
+                                                                      dense:
+                                                                          false,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
                                                             );
                                                           },
-                                                        );
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  'VICE PRESIDENT',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .titleLarge
-                                                      .override(
-                                                        fontFamily: 'Outfit',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .warning,
+                                                        ),
                                                       ),
-                                                ),
-                                                Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    FutureBuilder<
-                                                        List<UsersRecord>>(
-                                                      future:
-                                                          queryUsersRecordOnce(
-                                                        queryBuilder: (usersRecord) =>
-                                                            usersRecord.where(
-                                                                'position',
-                                                                isEqualTo:
-                                                                    'vicePresident'),
-                                                      ),
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        // Customize what your widget looks like when it's loading.
-                                                        if (!snapshot.hasData) {
-                                                          return Center(
-                                                            child: SizedBox(
-                                                              width: 50.0,
-                                                              height: 50.0,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                valueColor:
-                                                                    AlwaysStoppedAnimation<
-                                                                        Color>(
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primary,
-                                                                ),
-                                                              ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    'VICE PRESIDENT',
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .titleLarge
+                                                        .override(
+                                                          fontFamily: 'Outfit',
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .warning,
+                                                        ),
+                                                  ),
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Container(
+                                                        width: double.infinity,
+                                                        decoration:
+                                                            BoxDecoration(),
+                                                        child: FutureBuilder<
+                                                            List<UsersRecord>>(
+                                                          future:
+                                                              queryUsersRecordOnce(
+                                                            queryBuilder:
+                                                                (usersRecord) =>
+                                                                    usersRecord
+                                                                        .where(
+                                                              'position',
+                                                              isEqualTo:
+                                                                  'vicePresident',
                                                             ),
-                                                          );
-                                                        }
-                                                        List<UsersRecord>
-                                                            listViewUsersRecordList =
-                                                            snapshot.data!;
-                                                        return ListView
-                                                            .separated(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical:
-                                                                      10.0),
-                                                          shrinkWrap: true,
-                                                          scrollDirection:
-                                                              Axis.vertical,
-                                                          itemCount:
-                                                              listViewUsersRecordList
-                                                                  .length,
-                                                          separatorBuilder: (_,
-                                                                  __) =>
-                                                              SizedBox(
-                                                                  height: 10.0),
-                                                          itemBuilder: (context,
-                                                              listViewIndex) {
-                                                            final listViewUsersRecord =
-                                                                listViewUsersRecordList[
-                                                                    listViewIndex];
-                                                            return Slidable(
-                                                              endActionPane:
-                                                                  ActionPane(
-                                                                motion:
-                                                                    const ScrollMotion(),
-                                                                extentRatio:
-                                                                    0.25,
-                                                                children: [
-                                                                  SlidableAction(
-                                                                    label:
-                                                                        'Delete',
-                                                                    backgroundColor:
-                                                                        Color(
-                                                                            0xFFFF0000),
-                                                                    icon: Icons
-                                                                        .delete,
-                                                                    onPressed:
-                                                                        (_) async {
-                                                                      await listViewUsersRecord
-                                                                          .reference
-                                                                          .update({
-                                                                        ...createUsersRecordData(
-                                                                          isCandidate:
-                                                                              false,
-                                                                          voteCount:
-                                                                              0,
-                                                                        ),
-                                                                        'position':
-                                                                            FieldValue.delete(),
-                                                                      });
-                                                                      ScaffoldMessenger.of(
+                                                          ),
+                                                          builder: (context,
+                                                              snapshot) {
+                                                            // Customize what your widget looks like when it's loading.
+                                                            if (!snapshot
+                                                                .hasData) {
+                                                              return Center(
+                                                                child: SizedBox(
+                                                                  width: 50.0,
+                                                                  height: 50.0,
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                    valueColor:
+                                                                        AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                      FlutterFlowTheme.of(
                                                                               context)
-                                                                          .showSnackBar(
-                                                                        SnackBar(
-                                                                          content:
-                                                                              Text(
-                                                                            'Successfully deleted!',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: FlutterFlowTheme.of(context).primaryText,
-                                                                            ),
-                                                                          ),
-                                                                          duration:
-                                                                              Duration(milliseconds: 500),
-                                                                          backgroundColor:
-                                                                              FlutterFlowTheme.of(context).secondary,
-                                                                        ),
-                                                                      );
-                                                                      FFAppState()
-                                                                          .update(
-                                                                              () {});
-                                                                    },
+                                                                          .primary,
+                                                                    ),
                                                                   ),
-                                                                ],
-                                                              ),
-                                                              child: ListTile(
-                                                                title: Text(
-                                                                  listViewUsersRecord
-                                                                      .displayName,
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .titleLarge
-                                                                      .override(
-                                                                        fontFamily:
-                                                                            'Outfit',
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .info,
-                                                                        fontSize:
-                                                                            18.0,
+                                                                ),
+                                                              );
+                                                            }
+                                                            List<UsersRecord>
+                                                                listViewUsersRecordList =
+                                                                snapshot.data!;
+                                                            return ListView
+                                                                .separated(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          10.0),
+                                                              primary: false,
+                                                              shrinkWrap: true,
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              itemCount:
+                                                                  listViewUsersRecordList
+                                                                      .length,
+                                                              separatorBuilder: (_,
+                                                                      __) =>
+                                                                  SizedBox(
+                                                                      height:
+                                                                          10.0),
+                                                              itemBuilder: (context,
+                                                                  listViewIndex) {
+                                                                final listViewUsersRecord =
+                                                                    listViewUsersRecordList[
+                                                                        listViewIndex];
+                                                                return Container(
+                                                                  width: 100.0,
+                                                                  height: 60.0,
+                                                                  decoration:
+                                                                      BoxDecoration(),
+                                                                  child:
+                                                                      Slidable(
+                                                                    endActionPane:
+                                                                        ActionPane(
+                                                                      motion:
+                                                                          const ScrollMotion(),
+                                                                      extentRatio:
+                                                                          0.25,
+                                                                      children: [
+                                                                        SlidableAction(
+                                                                          label:
+                                                                              'Delete',
+                                                                          backgroundColor:
+                                                                              Color(0xFFFF0000),
+                                                                          icon:
+                                                                              Icons.delete,
+                                                                          onPressed:
+                                                                              (_) async {
+                                                                            await listViewUsersRecord.reference.update({
+                                                                              ...createUsersRecordData(
+                                                                                isCandidate: false,
+                                                                                voteCount: 0,
+                                                                              ),
+                                                                              ...mapToFirestore(
+                                                                                {
+                                                                                  'position': FieldValue.delete(),
+                                                                                },
+                                                                              ),
+                                                                            });
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Text(
+                                                                                  'Successfully deleted!',
+                                                                                  style: TextStyle(
+                                                                                    color: FlutterFlowTheme.of(context).primaryText,
+                                                                                  ),
+                                                                                ),
+                                                                                duration: Duration(milliseconds: 500),
+                                                                                backgroundColor: FlutterFlowTheme.of(context).secondary,
+                                                                              ),
+                                                                            );
+                                                                            FFAppState().update(() {});
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    child:
+                                                                        ListTile(
+                                                                      title:
+                                                                          Text(
+                                                                        listViewUsersRecord
+                                                                            .displayName,
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .titleLarge
+                                                                            .override(
+                                                                              fontFamily: 'Outfit',
+                                                                              color: FlutterFlowTheme.of(context).info,
+                                                                              fontSize: 18.0,
+                                                                            ),
                                                                       ),
-                                                                ),
-                                                                trailing: Icon(
-                                                                  Icons
-                                                                      .arrow_forward_ios,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  size: 20.0,
-                                                                ),
-                                                                tileColor: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryBackground,
-                                                                dense: false,
-                                                              ),
+                                                                      trailing:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_forward_ios,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .secondaryText,
+                                                                        size:
+                                                                            20.0,
+                                                                      ),
+                                                                      tileColor:
+                                                                          FlutterFlowTheme.of(context)
+                                                                              .secondaryBackground,
+                                                                      dense:
+                                                                          false,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
                                                             );
                                                           },
-                                                        );
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  'SECRETARY',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .titleLarge
-                                                      .override(
-                                                        fontFamily: 'Outfit',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .warning,
+                                                        ),
                                                       ),
-                                                ),
-                                                Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    FutureBuilder<
-                                                        List<UsersRecord>>(
-                                                      future:
-                                                          queryUsersRecordOnce(
-                                                        queryBuilder: (usersRecord) =>
-                                                            usersRecord.where(
-                                                                'position',
-                                                                isEqualTo:
-                                                                    'secretary'),
-                                                      ),
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        // Customize what your widget looks like when it's loading.
-                                                        if (!snapshot.hasData) {
-                                                          return Center(
-                                                            child: SizedBox(
-                                                              width: 50.0,
-                                                              height: 50.0,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                valueColor:
-                                                                    AlwaysStoppedAnimation<
-                                                                        Color>(
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primary,
-                                                                ),
-                                                              ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    'SECRETARY',
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .titleLarge
+                                                        .override(
+                                                          fontFamily: 'Outfit',
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .warning,
+                                                        ),
+                                                  ),
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Container(
+                                                        width: double.infinity,
+                                                        decoration:
+                                                            BoxDecoration(),
+                                                        child: FutureBuilder<
+                                                            List<UsersRecord>>(
+                                                          future:
+                                                              queryUsersRecordOnce(
+                                                            queryBuilder:
+                                                                (usersRecord) =>
+                                                                    usersRecord
+                                                                        .where(
+                                                              'position',
+                                                              isEqualTo:
+                                                                  'secretary',
                                                             ),
-                                                          );
-                                                        }
-                                                        List<UsersRecord>
-                                                            listViewUsersRecordList =
-                                                            snapshot.data!;
-                                                        return ListView
-                                                            .separated(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical:
-                                                                      10.0),
-                                                          shrinkWrap: true,
-                                                          scrollDirection:
-                                                              Axis.vertical,
-                                                          itemCount:
-                                                              listViewUsersRecordList
-                                                                  .length,
-                                                          separatorBuilder: (_,
-                                                                  __) =>
-                                                              SizedBox(
-                                                                  height: 10.0),
-                                                          itemBuilder: (context,
-                                                              listViewIndex) {
-                                                            final listViewUsersRecord =
-                                                                listViewUsersRecordList[
-                                                                    listViewIndex];
-                                                            return Slidable(
-                                                              endActionPane:
-                                                                  ActionPane(
-                                                                motion:
-                                                                    const ScrollMotion(),
-                                                                extentRatio:
-                                                                    0.25,
-                                                                children: [
-                                                                  SlidableAction(
-                                                                    label:
-                                                                        'Delete',
-                                                                    backgroundColor:
-                                                                        Color(
-                                                                            0xFFFF0000),
-                                                                    icon: Icons
-                                                                        .delete,
-                                                                    onPressed:
-                                                                        (_) async {
-                                                                      await listViewUsersRecord
-                                                                          .reference
-                                                                          .update({
-                                                                        ...createUsersRecordData(
-                                                                          isCandidate:
-                                                                              false,
-                                                                          voteCount:
-                                                                              0,
-                                                                        ),
-                                                                        'position':
-                                                                            FieldValue.delete(),
-                                                                      });
-                                                                      ScaffoldMessenger.of(
+                                                          ),
+                                                          builder: (context,
+                                                              snapshot) {
+                                                            // Customize what your widget looks like when it's loading.
+                                                            if (!snapshot
+                                                                .hasData) {
+                                                              return Center(
+                                                                child: SizedBox(
+                                                                  width: 50.0,
+                                                                  height: 50.0,
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                    valueColor:
+                                                                        AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                      FlutterFlowTheme.of(
                                                                               context)
-                                                                          .showSnackBar(
-                                                                        SnackBar(
-                                                                          content:
-                                                                              Text(
-                                                                            'Successfully deleted!',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: FlutterFlowTheme.of(context).primaryText,
-                                                                            ),
-                                                                          ),
-                                                                          duration:
-                                                                              Duration(milliseconds: 500),
-                                                                          backgroundColor:
-                                                                              FlutterFlowTheme.of(context).secondary,
-                                                                        ),
-                                                                      );
-                                                                      FFAppState()
-                                                                          .update(
-                                                                              () {});
-                                                                    },
+                                                                          .primary,
+                                                                    ),
                                                                   ),
-                                                                ],
-                                                              ),
-                                                              child: ListTile(
-                                                                title: Text(
-                                                                  listViewUsersRecord
-                                                                      .displayName,
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .titleLarge
-                                                                      .override(
-                                                                        fontFamily:
-                                                                            'Outfit',
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .info,
-                                                                        fontSize:
-                                                                            18.0,
+                                                                ),
+                                                              );
+                                                            }
+                                                            List<UsersRecord>
+                                                                listViewUsersRecordList =
+                                                                snapshot.data!;
+                                                            return ListView
+                                                                .separated(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          10.0),
+                                                              primary: false,
+                                                              shrinkWrap: true,
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              itemCount:
+                                                                  listViewUsersRecordList
+                                                                      .length,
+                                                              separatorBuilder: (_,
+                                                                      __) =>
+                                                                  SizedBox(
+                                                                      height:
+                                                                          10.0),
+                                                              itemBuilder: (context,
+                                                                  listViewIndex) {
+                                                                final listViewUsersRecord =
+                                                                    listViewUsersRecordList[
+                                                                        listViewIndex];
+                                                                return Container(
+                                                                  width: 100.0,
+                                                                  height: 60.0,
+                                                                  decoration:
+                                                                      BoxDecoration(),
+                                                                  child:
+                                                                      Slidable(
+                                                                    endActionPane:
+                                                                        ActionPane(
+                                                                      motion:
+                                                                          const ScrollMotion(),
+                                                                      extentRatio:
+                                                                          0.25,
+                                                                      children: [
+                                                                        SlidableAction(
+                                                                          label:
+                                                                              'Delete',
+                                                                          backgroundColor:
+                                                                              Color(0xFFFF0000),
+                                                                          icon:
+                                                                              Icons.delete,
+                                                                          onPressed:
+                                                                              (_) async {
+                                                                            await listViewUsersRecord.reference.update({
+                                                                              ...createUsersRecordData(
+                                                                                isCandidate: false,
+                                                                                voteCount: 0,
+                                                                              ),
+                                                                              ...mapToFirestore(
+                                                                                {
+                                                                                  'position': FieldValue.delete(),
+                                                                                },
+                                                                              ),
+                                                                            });
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Text(
+                                                                                  'Successfully deleted!',
+                                                                                  style: TextStyle(
+                                                                                    color: FlutterFlowTheme.of(context).primaryText,
+                                                                                  ),
+                                                                                ),
+                                                                                duration: Duration(milliseconds: 500),
+                                                                                backgroundColor: FlutterFlowTheme.of(context).secondary,
+                                                                              ),
+                                                                            );
+                                                                            FFAppState().update(() {});
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    child:
+                                                                        ListTile(
+                                                                      title:
+                                                                          Text(
+                                                                        listViewUsersRecord
+                                                                            .displayName,
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .titleLarge
+                                                                            .override(
+                                                                              fontFamily: 'Outfit',
+                                                                              color: FlutterFlowTheme.of(context).info,
+                                                                              fontSize: 18.0,
+                                                                            ),
                                                                       ),
-                                                                ),
-                                                                trailing: Icon(
-                                                                  Icons
-                                                                      .arrow_forward_ios,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  size: 20.0,
-                                                                ),
-                                                                tileColor: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryBackground,
-                                                                dense: false,
-                                                              ),
+                                                                      trailing:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_forward_ios,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .secondaryText,
+                                                                        size:
+                                                                            20.0,
+                                                                      ),
+                                                                      tileColor:
+                                                                          FlutterFlowTheme.of(context)
+                                                                              .secondaryBackground,
+                                                                      dense:
+                                                                          false,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
                                                             );
                                                           },
-                                                        );
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  'TREASURER',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .titleLarge
-                                                      .override(
-                                                        fontFamily: 'Outfit',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .warning,
+                                                        ),
                                                       ),
-                                                ),
-                                                Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    FutureBuilder<
-                                                        List<UsersRecord>>(
-                                                      future:
-                                                          queryUsersRecordOnce(
-                                                        queryBuilder: (usersRecord) =>
-                                                            usersRecord.where(
-                                                                'position',
-                                                                isEqualTo:
-                                                                    'treasurer'),
-                                                      ),
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        // Customize what your widget looks like when it's loading.
-                                                        if (!snapshot.hasData) {
-                                                          return Center(
-                                                            child: SizedBox(
-                                                              width: 50.0,
-                                                              height: 50.0,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                valueColor:
-                                                                    AlwaysStoppedAnimation<
-                                                                        Color>(
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primary,
-                                                                ),
-                                                              ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    'TREASURER',
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .titleLarge
+                                                        .override(
+                                                          fontFamily: 'Outfit',
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .warning,
+                                                        ),
+                                                  ),
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Container(
+                                                        width: double.infinity,
+                                                        decoration:
+                                                            BoxDecoration(),
+                                                        child: FutureBuilder<
+                                                            List<UsersRecord>>(
+                                                          future:
+                                                              queryUsersRecordOnce(
+                                                            queryBuilder:
+                                                                (usersRecord) =>
+                                                                    usersRecord
+                                                                        .where(
+                                                              'position',
+                                                              isEqualTo:
+                                                                  'treasurer',
                                                             ),
-                                                          );
-                                                        }
-                                                        List<UsersRecord>
-                                                            listViewUsersRecordList =
-                                                            snapshot.data!;
-                                                        return ListView
-                                                            .separated(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical:
-                                                                      10.0),
-                                                          shrinkWrap: true,
-                                                          scrollDirection:
-                                                              Axis.vertical,
-                                                          itemCount:
-                                                              listViewUsersRecordList
-                                                                  .length,
-                                                          separatorBuilder: (_,
-                                                                  __) =>
-                                                              SizedBox(
-                                                                  height: 10.0),
-                                                          itemBuilder: (context,
-                                                              listViewIndex) {
-                                                            final listViewUsersRecord =
-                                                                listViewUsersRecordList[
-                                                                    listViewIndex];
-                                                            return Slidable(
-                                                              endActionPane:
-                                                                  ActionPane(
-                                                                motion:
-                                                                    const ScrollMotion(),
-                                                                extentRatio:
-                                                                    0.25,
-                                                                children: [
-                                                                  SlidableAction(
-                                                                    label:
-                                                                        'Delete',
-                                                                    backgroundColor:
-                                                                        Color(
-                                                                            0xFFFF0000),
-                                                                    icon: Icons
-                                                                        .delete,
-                                                                    onPressed:
-                                                                        (_) async {
-                                                                      await listViewUsersRecord
-                                                                          .reference
-                                                                          .update({
-                                                                        ...createUsersRecordData(
-                                                                          isCandidate:
-                                                                              false,
-                                                                          voteCount:
-                                                                              0,
-                                                                        ),
-                                                                        'position':
-                                                                            FieldValue.delete(),
-                                                                      });
-                                                                      ScaffoldMessenger.of(
+                                                          ),
+                                                          builder: (context,
+                                                              snapshot) {
+                                                            // Customize what your widget looks like when it's loading.
+                                                            if (!snapshot
+                                                                .hasData) {
+                                                              return Center(
+                                                                child: SizedBox(
+                                                                  width: 50.0,
+                                                                  height: 50.0,
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                    valueColor:
+                                                                        AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                      FlutterFlowTheme.of(
                                                                               context)
-                                                                          .showSnackBar(
-                                                                        SnackBar(
-                                                                          content:
-                                                                              Text(
-                                                                            'Successfully deleted!',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: FlutterFlowTheme.of(context).primaryText,
-                                                                            ),
-                                                                          ),
-                                                                          duration:
-                                                                              Duration(milliseconds: 500),
-                                                                          backgroundColor:
-                                                                              FlutterFlowTheme.of(context).secondary,
-                                                                        ),
-                                                                      );
-                                                                      FFAppState()
-                                                                          .update(
-                                                                              () {});
-                                                                    },
+                                                                          .primary,
+                                                                    ),
                                                                   ),
-                                                                ],
-                                                              ),
-                                                              child: ListTile(
-                                                                title: Text(
-                                                                  listViewUsersRecord
-                                                                      .displayName,
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .titleLarge
-                                                                      .override(
-                                                                        fontFamily:
-                                                                            'Outfit',
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .info,
-                                                                        fontSize:
-                                                                            18.0,
+                                                                ),
+                                                              );
+                                                            }
+                                                            List<UsersRecord>
+                                                                listViewUsersRecordList =
+                                                                snapshot.data!;
+                                                            return ListView
+                                                                .separated(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          10.0),
+                                                              primary: false,
+                                                              shrinkWrap: true,
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              itemCount:
+                                                                  listViewUsersRecordList
+                                                                      .length,
+                                                              separatorBuilder: (_,
+                                                                      __) =>
+                                                                  SizedBox(
+                                                                      height:
+                                                                          10.0),
+                                                              itemBuilder: (context,
+                                                                  listViewIndex) {
+                                                                final listViewUsersRecord =
+                                                                    listViewUsersRecordList[
+                                                                        listViewIndex];
+                                                                return Container(
+                                                                  width: 100.0,
+                                                                  height: 60.0,
+                                                                  decoration:
+                                                                      BoxDecoration(),
+                                                                  child:
+                                                                      Slidable(
+                                                                    endActionPane:
+                                                                        ActionPane(
+                                                                      motion:
+                                                                          const ScrollMotion(),
+                                                                      extentRatio:
+                                                                          0.25,
+                                                                      children: [
+                                                                        SlidableAction(
+                                                                          label:
+                                                                              'Delete',
+                                                                          backgroundColor:
+                                                                              Color(0xFFFF0000),
+                                                                          icon:
+                                                                              Icons.delete,
+                                                                          onPressed:
+                                                                              (_) async {
+                                                                            await listViewUsersRecord.reference.update({
+                                                                              ...createUsersRecordData(
+                                                                                isCandidate: false,
+                                                                                voteCount: 0,
+                                                                              ),
+                                                                              ...mapToFirestore(
+                                                                                {
+                                                                                  'position': FieldValue.delete(),
+                                                                                },
+                                                                              ),
+                                                                            });
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Text(
+                                                                                  'Successfully deleted!',
+                                                                                  style: TextStyle(
+                                                                                    color: FlutterFlowTheme.of(context).primaryText,
+                                                                                  ),
+                                                                                ),
+                                                                                duration: Duration(milliseconds: 500),
+                                                                                backgroundColor: FlutterFlowTheme.of(context).secondary,
+                                                                              ),
+                                                                            );
+                                                                            FFAppState().update(() {});
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    child:
+                                                                        ListTile(
+                                                                      title:
+                                                                          Text(
+                                                                        listViewUsersRecord
+                                                                            .displayName,
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .titleLarge
+                                                                            .override(
+                                                                              fontFamily: 'Outfit',
+                                                                              color: FlutterFlowTheme.of(context).info,
+                                                                              fontSize: 18.0,
+                                                                            ),
                                                                       ),
-                                                                ),
-                                                                trailing: Icon(
-                                                                  Icons
-                                                                      .arrow_forward_ios,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  size: 20.0,
-                                                                ),
-                                                                tileColor: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryBackground,
-                                                                dense: false,
-                                                              ),
+                                                                      trailing:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_forward_ios,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .secondaryText,
+                                                                        size:
+                                                                            20.0,
+                                                                      ),
+                                                                      tileColor:
+                                                                          FlutterFlowTheme.of(context)
+                                                                              .secondaryBackground,
+                                                                      dense:
+                                                                          false,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
                                                             );
                                                           },
-                                                        );
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  'AUDITOR',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .titleLarge
-                                                      .override(
-                                                        fontFamily: 'Outfit',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .warning,
+                                                        ),
                                                       ),
-                                                ),
-                                                Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    FutureBuilder<
-                                                        List<UsersRecord>>(
-                                                      future:
-                                                          queryUsersRecordOnce(
-                                                        queryBuilder:
-                                                            (usersRecord) =>
-                                                                usersRecord.where(
-                                                                    'position',
-                                                                    isEqualTo:
-                                                                        'auditor'),
-                                                      ),
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        // Customize what your widget looks like when it's loading.
-                                                        if (!snapshot.hasData) {
-                                                          return Center(
-                                                            child: SizedBox(
-                                                              width: 50.0,
-                                                              height: 50.0,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                valueColor:
-                                                                    AlwaysStoppedAnimation<
-                                                                        Color>(
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primary,
-                                                                ),
-                                                              ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    'AUDITOR',
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .titleLarge
+                                                        .override(
+                                                          fontFamily: 'Outfit',
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .warning,
+                                                        ),
+                                                  ),
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Container(
+                                                        width: double.infinity,
+                                                        decoration:
+                                                            BoxDecoration(),
+                                                        child: FutureBuilder<
+                                                            List<UsersRecord>>(
+                                                          future:
+                                                              queryUsersRecordOnce(
+                                                            queryBuilder:
+                                                                (usersRecord) =>
+                                                                    usersRecord
+                                                                        .where(
+                                                              'position',
+                                                              isEqualTo:
+                                                                  'auditor',
                                                             ),
-                                                          );
-                                                        }
-                                                        List<UsersRecord>
-                                                            listViewUsersRecordList =
-                                                            snapshot.data!;
-                                                        return ListView
-                                                            .separated(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical:
-                                                                      10.0),
-                                                          shrinkWrap: true,
-                                                          scrollDirection:
-                                                              Axis.vertical,
-                                                          itemCount:
-                                                              listViewUsersRecordList
-                                                                  .length,
-                                                          separatorBuilder: (_,
-                                                                  __) =>
-                                                              SizedBox(
-                                                                  height: 10.0),
-                                                          itemBuilder: (context,
-                                                              listViewIndex) {
-                                                            final listViewUsersRecord =
-                                                                listViewUsersRecordList[
-                                                                    listViewIndex];
-                                                            return Slidable(
-                                                              endActionPane:
-                                                                  ActionPane(
-                                                                motion:
-                                                                    const ScrollMotion(),
-                                                                extentRatio:
-                                                                    0.25,
-                                                                children: [
-                                                                  SlidableAction(
-                                                                    label:
-                                                                        'Delete',
-                                                                    backgroundColor:
-                                                                        Color(
-                                                                            0xFFFF0000),
-                                                                    icon: Icons
-                                                                        .delete,
-                                                                    onPressed:
-                                                                        (_) async {
-                                                                      await listViewUsersRecord
-                                                                          .reference
-                                                                          .update({
-                                                                        ...createUsersRecordData(
-                                                                          isCandidate:
-                                                                              false,
-                                                                          voteCount:
-                                                                              0,
-                                                                        ),
-                                                                        'position':
-                                                                            FieldValue.delete(),
-                                                                      });
-                                                                      ScaffoldMessenger.of(
+                                                          ),
+                                                          builder: (context,
+                                                              snapshot) {
+                                                            // Customize what your widget looks like when it's loading.
+                                                            if (!snapshot
+                                                                .hasData) {
+                                                              return Center(
+                                                                child: SizedBox(
+                                                                  width: 50.0,
+                                                                  height: 50.0,
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                    valueColor:
+                                                                        AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                      FlutterFlowTheme.of(
                                                                               context)
-                                                                          .showSnackBar(
-                                                                        SnackBar(
-                                                                          content:
-                                                                              Text(
-                                                                            'Successfully deleted!',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: FlutterFlowTheme.of(context).primaryText,
-                                                                            ),
-                                                                          ),
-                                                                          duration:
-                                                                              Duration(milliseconds: 500),
-                                                                          backgroundColor:
-                                                                              FlutterFlowTheme.of(context).secondary,
-                                                                        ),
-                                                                      );
-                                                                      FFAppState()
-                                                                          .update(
-                                                                              () {});
-                                                                    },
+                                                                          .primary,
+                                                                    ),
                                                                   ),
-                                                                ],
-                                                              ),
-                                                              child: ListTile(
-                                                                title: Text(
-                                                                  listViewUsersRecord
-                                                                      .displayName,
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .titleLarge
-                                                                      .override(
-                                                                        fontFamily:
-                                                                            'Outfit',
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .info,
-                                                                        fontSize:
-                                                                            18.0,
+                                                                ),
+                                                              );
+                                                            }
+                                                            List<UsersRecord>
+                                                                listViewUsersRecordList =
+                                                                snapshot.data!;
+                                                            return ListView
+                                                                .separated(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          10.0),
+                                                              primary: false,
+                                                              shrinkWrap: true,
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              itemCount:
+                                                                  listViewUsersRecordList
+                                                                      .length,
+                                                              separatorBuilder: (_,
+                                                                      __) =>
+                                                                  SizedBox(
+                                                                      height:
+                                                                          10.0),
+                                                              itemBuilder: (context,
+                                                                  listViewIndex) {
+                                                                final listViewUsersRecord =
+                                                                    listViewUsersRecordList[
+                                                                        listViewIndex];
+                                                                return Container(
+                                                                  width: 100.0,
+                                                                  height: 60.0,
+                                                                  decoration:
+                                                                      BoxDecoration(),
+                                                                  child:
+                                                                      Slidable(
+                                                                    endActionPane:
+                                                                        ActionPane(
+                                                                      motion:
+                                                                          const ScrollMotion(),
+                                                                      extentRatio:
+                                                                          0.25,
+                                                                      children: [
+                                                                        SlidableAction(
+                                                                          label:
+                                                                              'Delete',
+                                                                          backgroundColor:
+                                                                              Color(0xFFFF0000),
+                                                                          icon:
+                                                                              Icons.delete,
+                                                                          onPressed:
+                                                                              (_) async {
+                                                                            await listViewUsersRecord.reference.update({
+                                                                              ...createUsersRecordData(
+                                                                                isCandidate: false,
+                                                                                voteCount: 0,
+                                                                              ),
+                                                                              ...mapToFirestore(
+                                                                                {
+                                                                                  'position': FieldValue.delete(),
+                                                                                },
+                                                                              ),
+                                                                            });
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Text(
+                                                                                  'Successfully deleted!',
+                                                                                  style: TextStyle(
+                                                                                    color: FlutterFlowTheme.of(context).primaryText,
+                                                                                  ),
+                                                                                ),
+                                                                                duration: Duration(milliseconds: 500),
+                                                                                backgroundColor: FlutterFlowTheme.of(context).secondary,
+                                                                              ),
+                                                                            );
+                                                                            FFAppState().update(() {});
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    child:
+                                                                        ListTile(
+                                                                      title:
+                                                                          Text(
+                                                                        listViewUsersRecord
+                                                                            .displayName,
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .titleLarge
+                                                                            .override(
+                                                                              fontFamily: 'Outfit',
+                                                                              color: FlutterFlowTheme.of(context).info,
+                                                                              fontSize: 18.0,
+                                                                            ),
                                                                       ),
-                                                                ),
-                                                                trailing: Icon(
-                                                                  Icons
-                                                                      .arrow_forward_ios,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  size: 20.0,
-                                                                ),
-                                                                tileColor: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryBackground,
-                                                                dense: false,
-                                                              ),
+                                                                      trailing:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_forward_ios,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .secondaryText,
+                                                                        size:
+                                                                            20.0,
+                                                                      ),
+                                                                      tileColor:
+                                                                          FlutterFlowTheme.of(context)
+                                                                              .secondaryBackground,
+                                                                      dense:
+                                                                          false,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
                                                             );
                                                           },
-                                                        );
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  'BUSINESS MANAGER',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .titleLarge
-                                                      .override(
-                                                        fontFamily: 'Outfit',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .warning,
+                                                        ),
                                                       ),
-                                                ),
-                                                Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    FutureBuilder<
-                                                        List<UsersRecord>>(
-                                                      future:
-                                                          queryUsersRecordOnce(
-                                                        queryBuilder: (usersRecord) =>
-                                                            usersRecord.where(
-                                                                'position',
-                                                                isEqualTo:
-                                                                    'businessManager'),
-                                                      ),
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        // Customize what your widget looks like when it's loading.
-                                                        if (!snapshot.hasData) {
-                                                          return Center(
-                                                            child: SizedBox(
-                                                              width: 50.0,
-                                                              height: 50.0,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                valueColor:
-                                                                    AlwaysStoppedAnimation<
-                                                                        Color>(
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primary,
-                                                                ),
-                                                              ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    'BUSINESS MANAGER',
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .titleLarge
+                                                        .override(
+                                                          fontFamily: 'Outfit',
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .warning,
+                                                        ),
+                                                  ),
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Container(
+                                                        width: double.infinity,
+                                                        decoration:
+                                                            BoxDecoration(),
+                                                        child: FutureBuilder<
+                                                            List<UsersRecord>>(
+                                                          future:
+                                                              queryUsersRecordOnce(
+                                                            queryBuilder:
+                                                                (usersRecord) =>
+                                                                    usersRecord
+                                                                        .where(
+                                                              'position',
+                                                              isEqualTo:
+                                                                  'businessManager',
                                                             ),
-                                                          );
-                                                        }
-                                                        List<UsersRecord>
-                                                            listViewUsersRecordList =
-                                                            snapshot.data!;
-                                                        return ListView
-                                                            .separated(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical:
-                                                                      10.0),
-                                                          shrinkWrap: true,
-                                                          scrollDirection:
-                                                              Axis.vertical,
-                                                          itemCount:
-                                                              listViewUsersRecordList
-                                                                  .length,
-                                                          separatorBuilder: (_,
-                                                                  __) =>
-                                                              SizedBox(
-                                                                  height: 10.0),
-                                                          itemBuilder: (context,
-                                                              listViewIndex) {
-                                                            final listViewUsersRecord =
-                                                                listViewUsersRecordList[
-                                                                    listViewIndex];
-                                                            return Slidable(
-                                                              endActionPane:
-                                                                  ActionPane(
-                                                                motion:
-                                                                    const ScrollMotion(),
-                                                                extentRatio:
-                                                                    0.25,
-                                                                children: [
-                                                                  SlidableAction(
-                                                                    label:
-                                                                        'Delete',
-                                                                    backgroundColor:
-                                                                        Color(
-                                                                            0xFFFF0000),
-                                                                    icon: Icons
-                                                                        .delete,
-                                                                    onPressed:
-                                                                        (_) async {
-                                                                      await listViewUsersRecord
-                                                                          .reference
-                                                                          .update({
-                                                                        ...createUsersRecordData(
-                                                                          isCandidate:
-                                                                              false,
-                                                                          voteCount:
-                                                                              0,
-                                                                        ),
-                                                                        'position':
-                                                                            FieldValue.delete(),
-                                                                      });
-                                                                      ScaffoldMessenger.of(
+                                                          ),
+                                                          builder: (context,
+                                                              snapshot) {
+                                                            // Customize what your widget looks like when it's loading.
+                                                            if (!snapshot
+                                                                .hasData) {
+                                                              return Center(
+                                                                child: SizedBox(
+                                                                  width: 50.0,
+                                                                  height: 50.0,
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                    valueColor:
+                                                                        AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                      FlutterFlowTheme.of(
                                                                               context)
-                                                                          .showSnackBar(
-                                                                        SnackBar(
-                                                                          content:
-                                                                              Text(
-                                                                            'Successfully deleted!',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: FlutterFlowTheme.of(context).primaryText,
-                                                                            ),
-                                                                          ),
-                                                                          duration:
-                                                                              Duration(milliseconds: 500),
-                                                                          backgroundColor:
-                                                                              FlutterFlowTheme.of(context).secondary,
-                                                                        ),
-                                                                      );
-                                                                      FFAppState()
-                                                                          .update(
-                                                                              () {});
-                                                                    },
+                                                                          .primary,
+                                                                    ),
                                                                   ),
-                                                                ],
-                                                              ),
-                                                              child: ListTile(
-                                                                title: Text(
-                                                                  listViewUsersRecord
-                                                                      .displayName,
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .titleLarge
-                                                                      .override(
-                                                                        fontFamily:
-                                                                            'Outfit',
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .info,
-                                                                        fontSize:
-                                                                            18.0,
+                                                                ),
+                                                              );
+                                                            }
+                                                            List<UsersRecord>
+                                                                listViewUsersRecordList =
+                                                                snapshot.data!;
+                                                            return ListView
+                                                                .separated(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          10.0),
+                                                              primary: false,
+                                                              shrinkWrap: true,
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              itemCount:
+                                                                  listViewUsersRecordList
+                                                                      .length,
+                                                              separatorBuilder: (_,
+                                                                      __) =>
+                                                                  SizedBox(
+                                                                      height:
+                                                                          10.0),
+                                                              itemBuilder: (context,
+                                                                  listViewIndex) {
+                                                                final listViewUsersRecord =
+                                                                    listViewUsersRecordList[
+                                                                        listViewIndex];
+                                                                return Container(
+                                                                  width: 100.0,
+                                                                  height: 60.0,
+                                                                  decoration:
+                                                                      BoxDecoration(),
+                                                                  child:
+                                                                      Slidable(
+                                                                    endActionPane:
+                                                                        ActionPane(
+                                                                      motion:
+                                                                          const ScrollMotion(),
+                                                                      extentRatio:
+                                                                          0.25,
+                                                                      children: [
+                                                                        SlidableAction(
+                                                                          label:
+                                                                              'Delete',
+                                                                          backgroundColor:
+                                                                              Color(0xFFFF0000),
+                                                                          icon:
+                                                                              Icons.delete,
+                                                                          onPressed:
+                                                                              (_) async {
+                                                                            await listViewUsersRecord.reference.update({
+                                                                              ...createUsersRecordData(
+                                                                                isCandidate: false,
+                                                                                voteCount: 0,
+                                                                              ),
+                                                                              ...mapToFirestore(
+                                                                                {
+                                                                                  'position': FieldValue.delete(),
+                                                                                },
+                                                                              ),
+                                                                            });
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Text(
+                                                                                  'Successfully deleted!',
+                                                                                  style: TextStyle(
+                                                                                    color: FlutterFlowTheme.of(context).primaryText,
+                                                                                  ),
+                                                                                ),
+                                                                                duration: Duration(milliseconds: 500),
+                                                                                backgroundColor: FlutterFlowTheme.of(context).secondary,
+                                                                              ),
+                                                                            );
+                                                                            FFAppState().update(() {});
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    child:
+                                                                        ListTile(
+                                                                      title:
+                                                                          Text(
+                                                                        listViewUsersRecord
+                                                                            .displayName,
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .titleLarge
+                                                                            .override(
+                                                                              fontFamily: 'Outfit',
+                                                                              color: FlutterFlowTheme.of(context).info,
+                                                                              fontSize: 18.0,
+                                                                            ),
                                                                       ),
-                                                                ),
-                                                                trailing: Icon(
-                                                                  Icons
-                                                                      .arrow_forward_ios,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  size: 20.0,
-                                                                ),
-                                                                tileColor: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryBackground,
-                                                                dense: false,
-                                                              ),
+                                                                      trailing:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_forward_ios,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .secondaryText,
+                                                                        size:
+                                                                            20.0,
+                                                                      ),
+                                                                      tileColor:
+                                                                          FlutterFlowTheme.of(context)
+                                                                              .secondaryBackground,
+                                                                      dense:
+                                                                          false,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
                                                             );
                                                           },
-                                                        );
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  'PUBLIC INFO OFFICER',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .titleLarge
-                                                      .override(
-                                                        fontFamily: 'Outfit',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .warning,
+                                                        ),
                                                       ),
-                                                ),
-                                                Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    FutureBuilder<
-                                                        List<UsersRecord>>(
-                                                      future:
-                                                          queryUsersRecordOnce(
-                                                        queryBuilder:
-                                                            (usersRecord) =>
-                                                                usersRecord.where(
-                                                                    'position',
-                                                                    isEqualTo:
-                                                                        'pio'),
-                                                      ),
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        // Customize what your widget looks like when it's loading.
-                                                        if (!snapshot.hasData) {
-                                                          return Center(
-                                                            child: SizedBox(
-                                                              width: 50.0,
-                                                              height: 50.0,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                valueColor:
-                                                                    AlwaysStoppedAnimation<
-                                                                        Color>(
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primary,
-                                                                ),
-                                                              ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    'PUBLIC INFO OFFICER',
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .titleLarge
+                                                        .override(
+                                                          fontFamily: 'Outfit',
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .warning,
+                                                        ),
+                                                  ),
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Container(
+                                                        width: double.infinity,
+                                                        decoration:
+                                                            BoxDecoration(),
+                                                        child: FutureBuilder<
+                                                            List<UsersRecord>>(
+                                                          future:
+                                                              queryUsersRecordOnce(
+                                                            queryBuilder:
+                                                                (usersRecord) =>
+                                                                    usersRecord
+                                                                        .where(
+                                                              'position',
+                                                              isEqualTo: 'pio',
                                                             ),
-                                                          );
-                                                        }
-                                                        List<UsersRecord>
-                                                            listViewUsersRecordList =
-                                                            snapshot.data!;
-                                                        return ListView
-                                                            .separated(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical:
-                                                                      10.0),
-                                                          shrinkWrap: true,
-                                                          scrollDirection:
-                                                              Axis.vertical,
-                                                          itemCount:
-                                                              listViewUsersRecordList
-                                                                  .length,
-                                                          separatorBuilder: (_,
-                                                                  __) =>
-                                                              SizedBox(
-                                                                  height: 10.0),
-                                                          itemBuilder: (context,
-                                                              listViewIndex) {
-                                                            final listViewUsersRecord =
-                                                                listViewUsersRecordList[
-                                                                    listViewIndex];
-                                                            return Slidable(
-                                                              endActionPane:
-                                                                  ActionPane(
-                                                                motion:
-                                                                    const ScrollMotion(),
-                                                                extentRatio:
-                                                                    0.25,
-                                                                children: [
-                                                                  SlidableAction(
-                                                                    label:
-                                                                        'Delete',
-                                                                    backgroundColor:
-                                                                        Color(
-                                                                            0xFFFF0000),
-                                                                    icon: Icons
-                                                                        .delete,
-                                                                    onPressed:
-                                                                        (_) async {
-                                                                      await listViewUsersRecord
-                                                                          .reference
-                                                                          .update({
-                                                                        ...createUsersRecordData(
-                                                                          isCandidate:
-                                                                              false,
-                                                                          voteCount:
-                                                                              0,
-                                                                        ),
-                                                                        'position':
-                                                                            FieldValue.delete(),
-                                                                      });
-                                                                      ScaffoldMessenger.of(
+                                                          ),
+                                                          builder: (context,
+                                                              snapshot) {
+                                                            // Customize what your widget looks like when it's loading.
+                                                            if (!snapshot
+                                                                .hasData) {
+                                                              return Center(
+                                                                child: SizedBox(
+                                                                  width: 50.0,
+                                                                  height: 50.0,
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                    valueColor:
+                                                                        AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                      FlutterFlowTheme.of(
                                                                               context)
-                                                                          .showSnackBar(
-                                                                        SnackBar(
-                                                                          content:
-                                                                              Text(
-                                                                            'Successfully deleted!',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: FlutterFlowTheme.of(context).primaryText,
-                                                                            ),
-                                                                          ),
-                                                                          duration:
-                                                                              Duration(milliseconds: 500),
-                                                                          backgroundColor:
-                                                                              FlutterFlowTheme.of(context).secondary,
-                                                                        ),
-                                                                      );
-                                                                      FFAppState()
-                                                                          .update(
-                                                                              () {});
-                                                                    },
+                                                                          .primary,
+                                                                    ),
                                                                   ),
-                                                                ],
-                                                              ),
-                                                              child: ListTile(
-                                                                title: Text(
-                                                                  listViewUsersRecord
-                                                                      .displayName,
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .titleLarge
-                                                                      .override(
-                                                                        fontFamily:
-                                                                            'Outfit',
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .info,
-                                                                        fontSize:
-                                                                            18.0,
+                                                                ),
+                                                              );
+                                                            }
+                                                            List<UsersRecord>
+                                                                listViewUsersRecordList =
+                                                                snapshot.data!;
+                                                            return ListView
+                                                                .separated(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          10.0),
+                                                              primary: false,
+                                                              shrinkWrap: true,
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              itemCount:
+                                                                  listViewUsersRecordList
+                                                                      .length,
+                                                              separatorBuilder: (_,
+                                                                      __) =>
+                                                                  SizedBox(
+                                                                      height:
+                                                                          10.0),
+                                                              itemBuilder: (context,
+                                                                  listViewIndex) {
+                                                                final listViewUsersRecord =
+                                                                    listViewUsersRecordList[
+                                                                        listViewIndex];
+                                                                return Container(
+                                                                  width: 100.0,
+                                                                  height: 60.0,
+                                                                  decoration:
+                                                                      BoxDecoration(),
+                                                                  child:
+                                                                      Slidable(
+                                                                    endActionPane:
+                                                                        ActionPane(
+                                                                      motion:
+                                                                          const ScrollMotion(),
+                                                                      extentRatio:
+                                                                          0.25,
+                                                                      children: [
+                                                                        SlidableAction(
+                                                                          label:
+                                                                              'Delete',
+                                                                          backgroundColor:
+                                                                              Color(0xFFFF0000),
+                                                                          icon:
+                                                                              Icons.delete,
+                                                                          onPressed:
+                                                                              (_) async {
+                                                                            await listViewUsersRecord.reference.update({
+                                                                              ...createUsersRecordData(
+                                                                                isCandidate: false,
+                                                                                voteCount: 0,
+                                                                              ),
+                                                                              ...mapToFirestore(
+                                                                                {
+                                                                                  'position': FieldValue.delete(),
+                                                                                },
+                                                                              ),
+                                                                            });
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Text(
+                                                                                  'Successfully deleted!',
+                                                                                  style: TextStyle(
+                                                                                    color: FlutterFlowTheme.of(context).primaryText,
+                                                                                  ),
+                                                                                ),
+                                                                                duration: Duration(milliseconds: 500),
+                                                                                backgroundColor: FlutterFlowTheme.of(context).secondary,
+                                                                              ),
+                                                                            );
+                                                                            FFAppState().update(() {});
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    child:
+                                                                        ListTile(
+                                                                      title:
+                                                                          Text(
+                                                                        listViewUsersRecord
+                                                                            .displayName,
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .titleLarge
+                                                                            .override(
+                                                                              fontFamily: 'Outfit',
+                                                                              color: FlutterFlowTheme.of(context).info,
+                                                                              fontSize: 18.0,
+                                                                            ),
                                                                       ),
-                                                                ),
-                                                                trailing: Icon(
-                                                                  Icons
-                                                                      .arrow_forward_ios,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  size: 20.0,
-                                                                ),
-                                                                tileColor: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryBackground,
-                                                                dense: false,
-                                                              ),
+                                                                      trailing:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_forward_ios,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .secondaryText,
+                                                                        size:
+                                                                            20.0,
+                                                                      ),
+                                                                      tileColor:
+                                                                          FlutterFlowTheme.of(context)
+                                                                              .secondaryBackground,
+                                                                      dense:
+                                                                          false,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
                                                             );
                                                           },
-                                                        );
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                                Text(
-                                                  'REPRESENTATIVES',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .titleLarge
-                                                      .override(
-                                                        fontFamily: 'Outfit',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .warning,
+                                                        ),
                                                       ),
-                                                ),
-                                                Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    StreamBuilder<
-                                                        List<UsersRecord>>(
-                                                      stream: queryUsersRecord(
-                                                        queryBuilder: (usersRecord) =>
-                                                            usersRecord.where(
-                                                                'position',
-                                                                isEqualTo:
-                                                                    'representative'),
-                                                      ),
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        // Customize what your widget looks like when it's loading.
-                                                        if (!snapshot.hasData) {
-                                                          return Center(
-                                                            child: SizedBox(
-                                                              width: 50.0,
-                                                              height: 50.0,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                valueColor:
-                                                                    AlwaysStoppedAnimation<
-                                                                        Color>(
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primary,
-                                                                ),
-                                                              ),
+                                                    ],
+                                                  ),
+                                                  Text(
+                                                    'REPRESENTATIVES',
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .titleLarge
+                                                        .override(
+                                                          fontFamily: 'Outfit',
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .warning,
+                                                        ),
+                                                  ),
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Container(
+                                                        width: double.infinity,
+                                                        decoration:
+                                                            BoxDecoration(),
+                                                        child: StreamBuilder<
+                                                            List<UsersRecord>>(
+                                                          stream:
+                                                              queryUsersRecord(
+                                                            queryBuilder:
+                                                                (usersRecord) =>
+                                                                    usersRecord
+                                                                        .where(
+                                                              'position',
+                                                              isEqualTo:
+                                                                  'representative',
                                                             ),
-                                                          );
-                                                        }
-                                                        List<UsersRecord>
-                                                            listViewUsersRecordList =
-                                                            snapshot.data!;
-                                                        return ListView
-                                                            .separated(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical:
-                                                                      10.0),
-                                                          shrinkWrap: true,
-                                                          scrollDirection:
-                                                              Axis.vertical,
-                                                          itemCount:
-                                                              listViewUsersRecordList
-                                                                  .length,
-                                                          separatorBuilder: (_,
-                                                                  __) =>
-                                                              SizedBox(
-                                                                  height: 10.0),
-                                                          itemBuilder: (context,
-                                                              listViewIndex) {
-                                                            final listViewUsersRecord =
-                                                                listViewUsersRecordList[
-                                                                    listViewIndex];
-                                                            return Slidable(
-                                                              endActionPane:
-                                                                  ActionPane(
-                                                                motion:
-                                                                    const ScrollMotion(),
-                                                                extentRatio:
-                                                                    0.25,
-                                                                children: [
-                                                                  SlidableAction(
-                                                                    label:
-                                                                        'Delete',
-                                                                    backgroundColor:
-                                                                        Color(
-                                                                            0xFFFF0000),
-                                                                    icon: Icons
-                                                                        .delete,
-                                                                    onPressed:
-                                                                        (_) async {
-                                                                      await listViewUsersRecord
-                                                                          .reference
-                                                                          .update({
-                                                                        ...createUsersRecordData(
-                                                                          voteCount:
-                                                                              0,
-                                                                          isCandidate:
-                                                                              false,
-                                                                        ),
-                                                                        'position':
-                                                                            FieldValue.delete(),
-                                                                      });
-                                                                      ScaffoldMessenger.of(
+                                                          ),
+                                                          builder: (context,
+                                                              snapshot) {
+                                                            // Customize what your widget looks like when it's loading.
+                                                            if (!snapshot
+                                                                .hasData) {
+                                                              return Center(
+                                                                child: SizedBox(
+                                                                  width: 50.0,
+                                                                  height: 50.0,
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                    valueColor:
+                                                                        AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                      FlutterFlowTheme.of(
                                                                               context)
-                                                                          .showSnackBar(
-                                                                        SnackBar(
-                                                                          content:
-                                                                              Text(
-                                                                            'Successfully deleted!',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: FlutterFlowTheme.of(context).primaryText,
-                                                                            ),
-                                                                          ),
-                                                                          duration:
-                                                                              Duration(milliseconds: 500),
-                                                                          backgroundColor:
-                                                                              FlutterFlowTheme.of(context).secondary,
-                                                                        ),
-                                                                      );
-                                                                      FFAppState()
-                                                                          .update(
-                                                                              () {});
-                                                                    },
+                                                                          .primary,
+                                                                    ),
                                                                   ),
-                                                                ],
-                                                              ),
-                                                              child: ListTile(
-                                                                title: Text(
-                                                                  listViewUsersRecord
-                                                                      .displayName,
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .titleLarge
-                                                                      .override(
-                                                                        fontFamily:
-                                                                            'Outfit',
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .info,
-                                                                        fontSize:
-                                                                            18.0,
+                                                                ),
+                                                              );
+                                                            }
+                                                            List<UsersRecord>
+                                                                listViewUsersRecordList =
+                                                                snapshot.data!;
+                                                            return ListView
+                                                                .separated(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          10.0),
+                                                              primary: false,
+                                                              shrinkWrap: true,
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              itemCount:
+                                                                  listViewUsersRecordList
+                                                                      .length,
+                                                              separatorBuilder: (_,
+                                                                      __) =>
+                                                                  SizedBox(
+                                                                      height:
+                                                                          10.0),
+                                                              itemBuilder: (context,
+                                                                  listViewIndex) {
+                                                                final listViewUsersRecord =
+                                                                    listViewUsersRecordList[
+                                                                        listViewIndex];
+                                                                return Container(
+                                                                  width: 100.0,
+                                                                  height: 60.0,
+                                                                  decoration:
+                                                                      BoxDecoration(),
+                                                                  child:
+                                                                      Slidable(
+                                                                    endActionPane:
+                                                                        ActionPane(
+                                                                      motion:
+                                                                          const ScrollMotion(),
+                                                                      extentRatio:
+                                                                          0.25,
+                                                                      children: [
+                                                                        SlidableAction(
+                                                                          label:
+                                                                              'Delete',
+                                                                          backgroundColor:
+                                                                              Color(0xFFFF0000),
+                                                                          icon:
+                                                                              Icons.delete,
+                                                                          onPressed:
+                                                                              (_) async {
+                                                                            await listViewUsersRecord.reference.update({
+                                                                              ...createUsersRecordData(
+                                                                                voteCount: 0,
+                                                                                isCandidate: false,
+                                                                              ),
+                                                                              ...mapToFirestore(
+                                                                                {
+                                                                                  'position': FieldValue.delete(),
+                                                                                },
+                                                                              ),
+                                                                            });
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Text(
+                                                                                  'Successfully deleted!',
+                                                                                  style: TextStyle(
+                                                                                    color: FlutterFlowTheme.of(context).primaryText,
+                                                                                  ),
+                                                                                ),
+                                                                                duration: Duration(milliseconds: 500),
+                                                                                backgroundColor: FlutterFlowTheme.of(context).secondary,
+                                                                              ),
+                                                                            );
+                                                                            FFAppState().update(() {});
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    child:
+                                                                        ListTile(
+                                                                      title:
+                                                                          Text(
+                                                                        listViewUsersRecord
+                                                                            .displayName,
+                                                                        style: FlutterFlowTheme.of(context)
+                                                                            .titleLarge
+                                                                            .override(
+                                                                              fontFamily: 'Outfit',
+                                                                              color: FlutterFlowTheme.of(context).info,
+                                                                              fontSize: 18.0,
+                                                                            ),
                                                                       ),
-                                                                ),
-                                                                trailing: Icon(
-                                                                  Icons
-                                                                      .arrow_forward_ios,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  size: 20.0,
-                                                                ),
-                                                                tileColor: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryBackground,
-                                                                dense: false,
-                                                              ),
+                                                                      trailing:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .arrow_forward_ios,
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .secondaryText,
+                                                                        size:
+                                                                            20.0,
+                                                                      ),
+                                                                      tileColor:
+                                                                          FlutterFlowTheme.of(context)
+                                                                              .secondaryBackground,
+                                                                      dense:
+                                                                          false,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
                                                             );
                                                           },
-                                                        );
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              ]
-                                                  .divide(
-                                                      SizedBox(height: 10.0))
-                                                  .around(
-                                                      SizedBox(height: 10.0)),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ]
+                                                    .divide(
+                                                        SizedBox(height: 10.0))
+                                                    .around(
+                                                        SizedBox(height: 10.0)),
+                                              ),
                                             ),
                                           ),
                                         ],
