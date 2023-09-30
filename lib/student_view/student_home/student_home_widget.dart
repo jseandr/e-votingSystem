@@ -296,16 +296,9 @@ class _StudentHomeWidgetState extends State<StudentHomeWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.pushNamed(
-                                  'studentDashboard',
-                                  extra: <String, dynamic>{
-                                    kTransitionInfoKey: TransitionInfo(
-                                      hasTransition: true,
-                                      transitionType: PageTransitionType.fade,
-                                      duration: Duration(milliseconds: 0),
-                                    ),
-                                  },
-                                );
+                                if (FFAppState().votingPhaseSwitch != true) {
+                                  context.safePop();
+                                }
                               },
                               child: Container(
                                 width: double.infinity,

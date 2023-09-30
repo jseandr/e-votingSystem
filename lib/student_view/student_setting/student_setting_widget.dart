@@ -279,16 +279,9 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.pushNamed(
-                                  'studentDashboard',
-                                  extra: <String, dynamic>{
-                                    kTransitionInfoKey: TransitionInfo(
-                                      hasTransition: true,
-                                      transitionType: PageTransitionType.fade,
-                                      duration: Duration(milliseconds: 0),
-                                    ),
-                                  },
-                                );
+                                if (FFAppState().votingPhaseSwitch != true) {
+                                  context.safePop();
+                                }
                               },
                               child: Container(
                                 width: double.infinity,
@@ -1049,6 +1042,7 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                                     );
                                                   },
                                                 );
+                                                context.safePop();
                                               } else {
                                                 await currentUserReference!
                                                     .delete();
@@ -1060,9 +1054,6 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                                 GoRouter.of(context)
                                                     .clearRedirectLocation();
                                               }
-
-                                              context.goNamedAuth(
-                                                  'loginpage', context.mounted);
                                             },
                                             text: 'Delete Account',
                                             options: FFButtonOptions(

@@ -678,6 +678,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget>
                                                     .update(
                                                         createUsersRecordData(
                                                   isVerified: true,
+                                                  readyToVote: true,
                                                 ));
 
                                                 context.goNamedAuth(
