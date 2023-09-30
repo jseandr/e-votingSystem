@@ -358,16 +358,9 @@ class _StudentDashboardWidgetState extends State<StudentDashboardWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.pushNamed(
-                                  'studentVoting',
-                                  extra: <String, dynamic>{
-                                    kTransitionInfoKey: TransitionInfo(
-                                      hasTransition: true,
-                                      transitionType: PageTransitionType.fade,
-                                      duration: Duration(milliseconds: 0),
-                                    ),
-                                  },
-                                );
+                                if (FFAppState().votingPhaseSwitch != true) {
+                                  context.safePop();
+                                }
                               },
                               child: Container(
                                 width: double.infinity,
@@ -398,19 +391,25 @@ class _StudentDashboardWidgetState extends State<StudentDashboardWidget> {
                                           hoverColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
                                           onTap: () async {
-                                            context.goNamed(
-                                              'studentVoting',
-                                              extra: <String, dynamic>{
-                                                kTransitionInfoKey:
-                                                    TransitionInfo(
-                                                  hasTransition: true,
-                                                  transitionType:
-                                                      PageTransitionType.fade,
-                                                  duration:
-                                                      Duration(milliseconds: 0),
-                                                ),
-                                              },
-                                            );
+                                            if (valueOrDefault<bool>(
+                                                    currentUserDocument
+                                                        ?.readyToVote,
+                                                    false) ==
+                                                true) {
+                                              context.pushNamed(
+                                                'studentVoting',
+                                                extra: <String, dynamic>{
+                                                  kTransitionInfoKey:
+                                                      TransitionInfo(
+                                                    hasTransition: true,
+                                                    transitionType:
+                                                        PageTransitionType.fade,
+                                                    duration: Duration(
+                                                        milliseconds: 0),
+                                                  ),
+                                                },
+                                              );
+                                            }
                                           },
                                           child: Text(
                                             'Voting',
@@ -737,9 +736,7 @@ class _StudentDashboardWidgetState extends State<StudentDashboardWidget> {
                                           MainAxisAlignment.center,
                                       children: [
                                         FlutterFlowTimer(
-                                          initialTime: FFAppState()
-                                              .timerAppState!
-                                              .secondsSinceEpoch,
+                                          initialTime: _model.timerMilliseconds,
                                           getDisplayTime: (value) =>
                                               StopWatchTimer.getDisplayTime(
                                                   value,

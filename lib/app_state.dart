@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:csv/csv.dart';
-import 'package:synchronized/synchronized.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 
 class FFAppState extends ChangeNotifier {
@@ -20,26 +18,23 @@ class FFAppState extends ChangeNotifier {
   }
 
   Future initializePersistedState() async {
-    secureStorage = FlutterSecureStorage();
-    await _safeInitAsync(() async {
+    prefs = await SharedPreferences.getInstance();
+    _safeInit(() {
       _candidateSwitcherPersisted =
-          await secureStorage.getBool('ff_candidateSwitcherPersisted') ??
+          prefs.getBool('ff_candidateSwitcherPersisted') ??
               _candidateSwitcherPersisted;
     });
-    await _safeInitAsync(() async {
-      _forRepsBoolean =
-          await secureStorage.getBool('ff_forRepsBoolean') ?? _forRepsBoolean;
+    _safeInit(() {
+      _forRepsBoolean = prefs.getBool('ff_forRepsBoolean') ?? _forRepsBoolean;
     });
-    await _safeInitAsync(() async {
+    _safeInit(() {
       _RepresentativeMaxLimit =
-          await secureStorage.getInt('ff_RepresentativeMaxLimit') ??
-              _RepresentativeMaxLimit;
+          prefs.getInt('ff_RepresentativeMaxLimit') ?? _RepresentativeMaxLimit;
     });
-    await _safeInitAsync(() async {
-      if (await secureStorage.read(key: 'ff_User') != null) {
+    _safeInit(() {
+      if (prefs.containsKey('ff_User')) {
         try {
-          final serializedData =
-              await secureStorage.getString('ff_User') ?? '{}';
+          final serializedData = prefs.getString('ff_User') ?? '{}';
           _User =
               RepsInfoStruct.fromSerializableMap(jsonDecode(serializedData));
         } catch (e) {
@@ -47,16 +42,20 @@ class FFAppState extends ChangeNotifier {
         }
       }
     });
-    await _safeInitAsync(() async {
+    _safeInit(() {
       _isRepresentativeSelected =
-          await secureStorage.getBool('ff_isRepresentativeSelected') ??
+          prefs.getBool('ff_isRepresentativeSelected') ??
               _isRepresentativeSelected;
     });
-    await _safeInitAsync(() async {
-      _timerAppState = await secureStorage.read(key: 'ff_timerAppState') != null
+    _safeInit(() {
+      _timerAppState = prefs.containsKey('ff_timerAppState')
           ? DateTime.fromMillisecondsSinceEpoch(
-              (await secureStorage.getInt('ff_timerAppState'))!)
+              prefs.getInt('ff_timerAppState')!)
           : _timerAppState;
+    });
+    _safeInit(() {
+      _votingPhaseSwitch =
+          prefs.getBool('ff_votingPhaseSwitch') ?? _votingPhaseSwitch;
     });
   }
 
@@ -65,7 +64,7 @@ class FFAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  late FlutterSecureStorage secureStorage;
+  late SharedPreferences prefs;
 
   bool _presList = true;
   bool get presList => _presList;
@@ -125,60 +124,40 @@ class FFAppState extends ChangeNotifier {
   bool get candidateSwitcherPersisted => _candidateSwitcherPersisted;
   set candidateSwitcherPersisted(bool _value) {
     _candidateSwitcherPersisted = _value;
-    secureStorage.setBool('ff_candidateSwitcherPersisted', _value);
-  }
-
-  void deleteCandidateSwitcherPersisted() {
-    secureStorage.delete(key: 'ff_candidateSwitcherPersisted');
+    prefs.setBool('ff_candidateSwitcherPersisted', _value);
   }
 
   bool _forRepsBoolean = false;
   bool get forRepsBoolean => _forRepsBoolean;
   set forRepsBoolean(bool _value) {
     _forRepsBoolean = _value;
-    secureStorage.setBool('ff_forRepsBoolean', _value);
-  }
-
-  void deleteForRepsBoolean() {
-    secureStorage.delete(key: 'ff_forRepsBoolean');
+    prefs.setBool('ff_forRepsBoolean', _value);
   }
 
   int _RepresentativeMaxLimit = 6;
   int get RepresentativeMaxLimit => _RepresentativeMaxLimit;
   set RepresentativeMaxLimit(int _value) {
     _RepresentativeMaxLimit = _value;
-    secureStorage.setInt('ff_RepresentativeMaxLimit', _value);
-  }
-
-  void deleteRepresentativeMaxLimit() {
-    secureStorage.delete(key: 'ff_RepresentativeMaxLimit');
+    prefs.setInt('ff_RepresentativeMaxLimit', _value);
   }
 
   RepsInfoStruct _User = RepsInfoStruct();
   RepsInfoStruct get User => _User;
   set User(RepsInfoStruct _value) {
     _User = _value;
-    secureStorage.setString('ff_User', _value.serialize());
-  }
-
-  void deleteUser() {
-    secureStorage.delete(key: 'ff_User');
+    prefs.setString('ff_User', _value.serialize());
   }
 
   void updateUserStruct(Function(RepsInfoStruct) updateFn) {
     updateFn(_User);
-    secureStorage.setString('ff_User', _User.serialize());
+    prefs.setString('ff_User', _User.serialize());
   }
 
   bool _isRepresentativeSelected = false;
   bool get isRepresentativeSelected => _isRepresentativeSelected;
   set isRepresentativeSelected(bool _value) {
     _isRepresentativeSelected = _value;
-    secureStorage.setBool('ff_isRepresentativeSelected', _value);
-  }
-
-  void deleteIsRepresentativeSelected() {
-    secureStorage.delete(key: 'ff_isRepresentativeSelected');
+    prefs.setBool('ff_isRepresentativeSelected', _value);
   }
 
   DateTime? _timerAppState = DateTime.fromMillisecondsSinceEpoch(1695948000000);
@@ -186,13 +165,15 @@ class FFAppState extends ChangeNotifier {
   set timerAppState(DateTime? _value) {
     _timerAppState = _value;
     _value != null
-        ? secureStorage.setInt(
-            'ff_timerAppState', _value.millisecondsSinceEpoch)
-        : secureStorage.remove('ff_timerAppState');
+        ? prefs.setInt('ff_timerAppState', _value.millisecondsSinceEpoch)
+        : prefs.remove('ff_timerAppState');
   }
 
-  void deleteTimerAppState() {
-    secureStorage.delete(key: 'ff_timerAppState');
+  bool _votingPhaseSwitch = false;
+  bool get votingPhaseSwitch => _votingPhaseSwitch;
+  set votingPhaseSwitch(bool _value) {
+    _votingPhaseSwitch = _value;
+    prefs.setBool('ff_votingPhaseSwitch', _value);
   }
 }
 
@@ -216,47 +197,4 @@ Future _safeInitAsync(Function() initializeField) async {
   try {
     await initializeField();
   } catch (_) {}
-}
-
-extension FlutterSecureStorageExtensions on FlutterSecureStorage {
-  static final _lock = Lock();
-
-  Future<void> writeSync({required String key, String? value}) async =>
-      await _lock.synchronized(() async {
-        await write(key: key, value: value);
-      });
-
-  void remove(String key) => delete(key: key);
-
-  Future<String?> getString(String key) async => await read(key: key);
-  Future<void> setString(String key, String value) async =>
-      await writeSync(key: key, value: value);
-
-  Future<bool?> getBool(String key) async => (await read(key: key)) == 'true';
-  Future<void> setBool(String key, bool value) async =>
-      await writeSync(key: key, value: value.toString());
-
-  Future<int?> getInt(String key) async =>
-      int.tryParse(await read(key: key) ?? '');
-  Future<void> setInt(String key, int value) async =>
-      await writeSync(key: key, value: value.toString());
-
-  Future<double?> getDouble(String key) async =>
-      double.tryParse(await read(key: key) ?? '');
-  Future<void> setDouble(String key, double value) async =>
-      await writeSync(key: key, value: value.toString());
-
-  Future<List<String>?> getStringList(String key) async =>
-      await read(key: key).then((result) {
-        if (result == null || result.isEmpty) {
-          return null;
-        }
-        return CsvToListConverter()
-            .convert(result)
-            .first
-            .map((e) => e.toString())
-            .toList();
-      });
-  Future<void> setStringList(String key, List<String> value) async =>
-      await writeSync(key: key, value: ListToCsvConverter().convert([value]));
 }

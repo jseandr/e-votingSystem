@@ -597,10 +597,26 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                                   children: [
                                     FFButtonWidget(
                                       onPressed: () async {
-                                        await rowUsersRecord!.reference
-                                            .update(createUsersRecordData(
-                                          readyToVote: true,
-                                        ));
+                                        setState(() {
+                                          FFAppState().votingPhaseSwitch = true;
+                                        });
+                                        await showDialog(
+                                          context: context,
+                                          builder: (alertDialogContext) {
+                                            return AlertDialog(
+                                              content: Text(
+                                                  'VOTING PHASE IS NOW ON'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                          alertDialogContext),
+                                                  child: Text('Ok'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
                                       },
                                       text: 'On Voting',
                                       options: FFButtonOptions(
@@ -629,10 +645,27 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                                     ),
                                     FFButtonWidget(
                                       onPressed: () async {
-                                        await rowUsersRecord!.reference
-                                            .update(createUsersRecordData(
-                                          readyToVote: false,
-                                        ));
+                                        setState(() {
+                                          FFAppState().votingPhaseSwitch =
+                                              false;
+                                        });
+                                        await showDialog(
+                                          context: context,
+                                          builder: (alertDialogContext) {
+                                            return AlertDialog(
+                                              content: Text(
+                                                  'VOTING PHASE IS NOW OFF'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                          alertDialogContext),
+                                                  child: Text('Ok'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
                                       },
                                       text: 'Off Voting',
                                       options: FFButtonOptions(
@@ -673,7 +706,7 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                                 Flexible(
                                   child: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        24.0, 0.0, 24.0, 40.0),
+                                        24.0, 0.0, 24.0, 0.0),
                                     child: FFButtonWidget(
                                       onPressed: () async {
                                         GoRouter.of(context).prepareAuthEvent();
@@ -881,138 +914,144 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          FFButtonWidget(
-                                            onPressed: () async {
-                                              if (currentUserPhoto == '') {
-                                                await FirebaseStorage.instance
-                                                    .refFromURL(
-                                                        currentUserPhoto)
-                                                    .delete();
-                                              } else {
-                                                await FirebaseStorage.instance
-                                                    .refFromURL(
-                                                        currentUserPhoto)
-                                                    .delete();
-                                              }
-
-                                              final selectedMedia =
-                                                  await selectMediaWithSourceBottomSheet(
-                                                context: context,
-                                                maxWidth: 100.00,
-                                                maxHeight: 100.00,
-                                                imageQuality: 70,
-                                                allowPhoto: true,
-                                              );
-                                              if (selectedMedia != null &&
-                                                  selectedMedia.every((m) =>
-                                                      validateFileFormat(
-                                                          m.storagePath,
-                                                          context))) {
-                                                setState(() => _model
-                                                    .isDataUploading = true);
-                                                var selectedUploadedFiles =
-                                                    <FFUploadedFile>[];
-
-                                                var downloadUrls = <String>[];
-                                                try {
-                                                  showUploadMessage(
-                                                    context,
-                                                    'Uploading file...',
-                                                    showLoading: true,
-                                                  );
-                                                  selectedUploadedFiles =
-                                                      selectedMedia
-                                                          .map((m) =>
-                                                              FFUploadedFile(
-                                                                name: m
-                                                                    .storagePath
-                                                                    .split('/')
-                                                                    .last,
-                                                                bytes: m.bytes,
-                                                                height: m
-                                                                    .dimensions
-                                                                    ?.height,
-                                                                width: m
-                                                                    .dimensions
-                                                                    ?.width,
-                                                                blurHash:
-                                                                    m.blurHash,
-                                                              ))
-                                                          .toList();
-
-                                                  downloadUrls =
-                                                      (await Future.wait(
-                                                    selectedMedia.map(
-                                                      (m) async =>
-                                                          await uploadData(
-                                                              m.storagePath,
-                                                              m.bytes),
-                                                    ),
-                                                  ))
-                                                          .where(
-                                                              (u) => u != null)
-                                                          .map((u) => u!)
-                                                          .toList();
-                                                } finally {
-                                                  ScaffoldMessenger.of(context)
-                                                      .hideCurrentSnackBar();
-                                                  _model.isDataUploading =
-                                                      false;
+                                          Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    0.0, 0.0, 0.0, 20.0),
+                                            child: FFButtonWidget(
+                                              onPressed: () async {
+                                                if (currentUserPhoto != '') {
+                                                  await FirebaseStorage.instance
+                                                      .refFromURL(
+                                                          currentUserPhoto)
+                                                      .delete();
                                                 }
-                                                if (selectedUploadedFiles
-                                                            .length ==
-                                                        selectedMedia.length &&
-                                                    downloadUrls.length ==
-                                                        selectedMedia.length) {
-                                                  setState(() {
-                                                    _model.uploadedLocalFile =
-                                                        selectedUploadedFiles
-                                                            .first;
-                                                    _model.uploadedFileUrl =
-                                                        downloadUrls.first;
-                                                  });
-                                                  showUploadMessage(
-                                                      context, 'Success!');
-                                                } else {
-                                                  setState(() {});
-                                                  showUploadMessage(context,
-                                                      'Failed to upload data');
-                                                  return;
-                                                }
-                                              }
+                                                final selectedMedia =
+                                                    await selectMediaWithSourceBottomSheet(
+                                                  context: context,
+                                                  maxWidth: 100.00,
+                                                  maxHeight: 100.00,
+                                                  imageQuality: 70,
+                                                  allowPhoto: true,
+                                                );
+                                                if (selectedMedia != null &&
+                                                    selectedMedia.every((m) =>
+                                                        validateFileFormat(
+                                                            m.storagePath,
+                                                            context))) {
+                                                  setState(() => _model
+                                                      .isDataUploading = true);
+                                                  var selectedUploadedFiles =
+                                                      <FFUploadedFile>[];
 
-                                              await currentUserReference!
-                                                  .update(createUsersRecordData(
-                                                photoUrl:
-                                                    _model.uploadedFileUrl,
-                                              ));
-                                            },
-                                            text: 'Upload Image',
-                                            options: FFButtonOptions(
-                                              height: 40.0,
-                                              padding: EdgeInsetsDirectional
-                                                  .fromSTEB(
-                                                      24.0, 0.0, 24.0, 0.0),
-                                              iconPadding: EdgeInsetsDirectional
-                                                  .fromSTEB(0.0, 0.0, 0.0, 0.0),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
-                                              textStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleSmall
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        color: Colors.white,
+                                                  var downloadUrls = <String>[];
+                                                  try {
+                                                    showUploadMessage(
+                                                      context,
+                                                      'Uploading file...',
+                                                      showLoading: true,
+                                                    );
+                                                    selectedUploadedFiles =
+                                                        selectedMedia
+                                                            .map((m) =>
+                                                                FFUploadedFile(
+                                                                  name: m
+                                                                      .storagePath
+                                                                      .split(
+                                                                          '/')
+                                                                      .last,
+                                                                  bytes:
+                                                                      m.bytes,
+                                                                  height: m
+                                                                      .dimensions
+                                                                      ?.height,
+                                                                  width: m
+                                                                      .dimensions
+                                                                      ?.width,
+                                                                  blurHash: m
+                                                                      .blurHash,
+                                                                ))
+                                                            .toList();
+
+                                                    downloadUrls = (await Future
+                                                            .wait(
+                                                      selectedMedia.map(
+                                                        (m) async =>
+                                                            await uploadData(
+                                                                m.storagePath,
+                                                                m.bytes),
                                                       ),
-                                              elevation: 3.0,
-                                              borderSide: BorderSide(
-                                                color: Colors.transparent,
-                                                width: 1.0,
+                                                    ))
+                                                        .where((u) => u != null)
+                                                        .map((u) => u!)
+                                                        .toList();
+                                                  } finally {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .hideCurrentSnackBar();
+                                                    _model.isDataUploading =
+                                                        false;
+                                                  }
+                                                  if (selectedUploadedFiles
+                                                              .length ==
+                                                          selectedMedia
+                                                              .length &&
+                                                      downloadUrls.length ==
+                                                          selectedMedia
+                                                              .length) {
+                                                    setState(() {
+                                                      _model.uploadedLocalFile =
+                                                          selectedUploadedFiles
+                                                              .first;
+                                                      _model.uploadedFileUrl =
+                                                          downloadUrls.first;
+                                                    });
+                                                    showUploadMessage(
+                                                        context, 'Success!');
+                                                  } else {
+                                                    setState(() {});
+                                                    showUploadMessage(context,
+                                                        'Failed to upload data');
+                                                    return;
+                                                  }
+                                                }
+
+                                                await currentUserReference!
+                                                    .update(
+                                                        createUsersRecordData(
+                                                  photoUrl:
+                                                      _model.uploadedFileUrl,
+                                                ));
+                                              },
+                                              text: 'Upload Image',
+                                              options: FFButtonOptions(
+                                                height: 40.0,
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(
+                                                        24.0, 0.0, 24.0, 0.0),
+                                                iconPadding:
+                                                    EdgeInsetsDirectional
+                                                        .fromSTEB(
+                                                            0.0, 0.0, 0.0, 0.0),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primary,
+                                                textStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .titleSmall
+                                                        .override(
+                                                          fontFamily:
+                                                              'Readex Pro',
+                                                          color: Colors.white,
+                                                        ),
+                                                elevation: 3.0,
+                                                borderSide: BorderSide(
+                                                  color: Colors.transparent,
+                                                  width: 1.0,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
                                               ),
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
                                             ),
                                           ),
                                         ],
@@ -1112,60 +1151,9 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                                           ),
                                         ],
                                       ),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'ID:',
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  fontFamily: 'Readex Pro',
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .info,
-                                                ),
-                                          ),
-                                          Container(
-                                            width: 284.0,
-                                            height: 40.0,
-                                            decoration: BoxDecoration(),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                AuthUserStreamWidget(
-                                                  builder: (context) => Text(
-                                                    valueOrDefault(
-                                                        currentUserDocument
-                                                            ?.studentId,
-                                                        ''),
-                                                    style: FlutterFlowTheme.of(
-                                                            context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          fontFamily:
-                                                              'Readex Pro',
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .info,
-                                                          fontSize: 18.0,
-                                                        ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
                                     ]
-                                        .divide(SizedBox(height: 30.0))
-                                        .around(SizedBox(height: 30.0)),
+                                        .divide(SizedBox(height: 35.0))
+                                        .around(SizedBox(height: 35.0)),
                                   ),
                                 ),
                               ),

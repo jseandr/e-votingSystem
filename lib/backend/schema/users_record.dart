@@ -173,6 +173,11 @@ class UsersRecord extends FirestoreRecord {
   List<RepsInfoStruct> get pioDataList => _pioDataList ?? const [];
   bool hasPioDataList() => _pioDataList != null;
 
+  // "photos" field.
+  DocumentReference? _photos;
+  DocumentReference? get photos => _photos;
+  bool hasPhotos() => _photos != null;
+
   void _initializeFields() {
     _displayName = snapshotData['display_name'] as String?;
     _photoUrl = snapshotData['photo_url'] as String?;
@@ -229,6 +234,7 @@ class UsersRecord extends FirestoreRecord {
       snapshotData['pioDataList'],
       RepsInfoStruct.fromMap,
     );
+    _photos = snapshotData['photos'] as DocumentReference?;
   }
 
   static CollectionReference get collection =>
@@ -288,6 +294,7 @@ Map<String, dynamic> createUsersRecordData({
   bool? repVote,
   bool? isCandidate,
   bool? isVerified,
+  DocumentReference? photos,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -314,6 +321,7 @@ Map<String, dynamic> createUsersRecordData({
       'repVote': repVote,
       'is_candidate': isCandidate,
       'is_verified': isVerified,
+      'photos': photos,
     }.withoutNulls,
   );
 
@@ -357,7 +365,8 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         listEquality.equals(e1?.auditorDataList, e2?.auditorDataList) &&
         listEquality.equals(
             e1?.businessManagerDataList, e2?.businessManagerDataList) &&
-        listEquality.equals(e1?.pioDataList, e2?.pioDataList);
+        listEquality.equals(e1?.pioDataList, e2?.pioDataList) &&
+        e1?.photos == e2?.photos;
   }
 
   @override
@@ -392,7 +401,8 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.treasurerDataList,
         e?.auditorDataList,
         e?.businessManagerDataList,
-        e?.pioDataList
+        e?.pioDataList,
+        e?.photos
       ]);
 
   @override

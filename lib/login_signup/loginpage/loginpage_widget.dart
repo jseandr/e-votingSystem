@@ -1571,7 +1571,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget>
                                                 ),
                                               ),
                                               duration:
-                                                  Duration(milliseconds: 500),
+                                                  Duration(milliseconds: 1000),
                                               backgroundColor:
                                                   FlutterFlowTheme.of(context)
                                                       .secondary,

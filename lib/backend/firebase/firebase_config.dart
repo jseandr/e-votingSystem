@@ -5,13 +5,13 @@ Future initFirebase() async {
   if (kIsWeb) {
     await Firebase.initializeApp(
         options: FirebaseOptions(
-            apiKey: "AIzaSyDbFQs3WlW4iRZttSaB13nJ56jANOzSnoA",
-            authDomain: "votingsystem-c80eb.firebaseapp.com",
-            projectId: "votingsystem-c80eb",
-            storageBucket: "votingsystem-c80eb.appspot.com",
-            messagingSenderId: "44127129486",
-            appId: "1:44127129486:web:c8d5c57d41d35fb23a1edf",
-            measurementId: "G-V06SLW79BZ"));
+            apiKey: "AIzaSyDUev_w7SfmtNZWklvx87UbGBs4Sw8F6J8",
+            authDomain: "bupe-votingsystem.firebaseapp.com",
+            projectId: "bupe-votingsystem",
+            storageBucket: "bupe-votingsystem.appspot.com",
+            messagingSenderId: "949925366032",
+            appId: "1:949925366032:web:c03bdfbdee92da6513fd95",
+            measurementId: "G-7B4WFCK6QV"));
   } else {
     await Firebase.initializeApp();
   }

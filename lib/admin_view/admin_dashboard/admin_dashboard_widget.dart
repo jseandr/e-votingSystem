@@ -6,7 +6,6 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -586,10 +585,26 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                                   children: [
                                     FFButtonWidget(
                                       onPressed: () async {
-                                        await rowUsersRecord!.reference
-                                            .update(createUsersRecordData(
-                                          readyToVote: true,
-                                        ));
+                                        setState(() {
+                                          FFAppState().votingPhaseSwitch = true;
+                                        });
+                                        await showDialog(
+                                          context: context,
+                                          builder: (alertDialogContext) {
+                                            return AlertDialog(
+                                              content: Text(
+                                                  'VOTING PHASE IS NOW ON'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                          alertDialogContext),
+                                                  child: Text('Ok'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
                                       },
                                       text: 'On Voting',
                                       options: FFButtonOptions(
@@ -618,10 +633,27 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                                     ),
                                     FFButtonWidget(
                                       onPressed: () async {
-                                        await rowUsersRecord!.reference
-                                            .update(createUsersRecordData(
-                                          readyToVote: false,
-                                        ));
+                                        setState(() {
+                                          FFAppState().votingPhaseSwitch =
+                                              false;
+                                        });
+                                        await showDialog(
+                                          context: context,
+                                          builder: (alertDialogContext) {
+                                            return AlertDialog(
+                                              content: Text(
+                                                  'VOTING PHASE IS NOW OFF'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                          alertDialogContext),
+                                                  child: Text('Ok'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
                                       },
                                       text: 'Off Voting',
                                       options: FFButtonOptions(
@@ -873,9 +905,7 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                                           MainAxisAlignment.center,
                                       children: [
                                         FlutterFlowTimer(
-                                          initialTime: FFAppState()
-                                              .timerAppState!
-                                              .secondsSinceEpoch,
+                                          initialTime: _model.timerMilliseconds,
                                           getDisplayTime: (value) =>
                                               StopWatchTimer.getDisplayTime(
                                                   value,

@@ -7,7 +7,6 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import 'admin_dashboard_widget.dart' show AdminDashboardWidget;
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -17,8 +16,9 @@ class AdminDashboardModel extends FlutterFlowModel<AdminDashboardWidget> {
 
   final unfocusNode = FocusNode();
   // State field(s) for Timer widget.
-  int timerMilliseconds = 0;
-  String timerValue = StopWatchTimer.getDisplayTime(0, milliSecond: false);
+  int timerMilliseconds = 86400000;
+  String timerValue =
+      StopWatchTimer.getDisplayTime(86400000, milliSecond: false);
   FlutterFlowTimerController timerController =
       FlutterFlowTimerController(StopWatchTimer(mode: StopWatchMode.countDown));
 

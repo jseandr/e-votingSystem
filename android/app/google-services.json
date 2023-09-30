@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "44127129486",
-    "project_id": "votingsystem-c80eb",
-    "storage_bucket": "votingsystem-c80eb.appspot.com"
+    "project_number": "949925366032",
+    "project_id": "bupe-votingsystem",
+    "storage_bucket": "bupe-votingsystem.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:44127129486:android:2d39bc85d40de8133a1edf",
+        "mobilesdk_app_id": "1:949925366032:android:6afb131974f63b4113fd95",
         "android_client_info": {
           "package_name": "com.mycompany.bupEVotingSystem"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBWerk0H-mIaBway2b7ah45IpVhLtCEqmE"
+          "current_key": "AIzaSyCUni7323dLgQlpP1jQieHTk2cfjB1VHkU"
         }
       ],
       "services": {

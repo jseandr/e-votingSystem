@@ -377,16 +377,9 @@ class _StudentHomeWidgetState extends State<StudentHomeWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.pushNamed(
-                                  'studentVoting',
-                                  extra: <String, dynamic>{
-                                    kTransitionInfoKey: TransitionInfo(
-                                      hasTransition: true,
-                                      transitionType: PageTransitionType.fade,
-                                      duration: Duration(milliseconds: 0),
-                                    ),
-                                  },
-                                );
+                                if (FFAppState().votingPhaseSwitch != true) {
+                                  context.safePop();
+                                }
                               },
                               child: Container(
                                 width: double.infinity,
@@ -417,19 +410,25 @@ class _StudentHomeWidgetState extends State<StudentHomeWidget> {
                                           hoverColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
                                           onTap: () async {
-                                            context.goNamed(
-                                              'studentVoting',
-                                              extra: <String, dynamic>{
-                                                kTransitionInfoKey:
-                                                    TransitionInfo(
-                                                  hasTransition: true,
-                                                  transitionType:
-                                                      PageTransitionType.fade,
-                                                  duration:
-                                                      Duration(milliseconds: 0),
-                                                ),
-                                              },
-                                            );
+                                            if (valueOrDefault<bool>(
+                                                    currentUserDocument
+                                                        ?.readyToVote,
+                                                    false) ==
+                                                true) {
+                                              context.pushNamed(
+                                                'studentVoting',
+                                                extra: <String, dynamic>{
+                                                  kTransitionInfoKey:
+                                                      TransitionInfo(
+                                                    hasTransition: true,
+                                                    transitionType:
+                                                        PageTransitionType.fade,
+                                                    duration: Duration(
+                                                        milliseconds: 0),
+                                                  ),
+                                                },
+                                              );
+                                            }
                                           },
                                           child: Text(
                                             'Voting',
@@ -862,13 +861,18 @@ class _StudentHomeWidgetState extends State<StudentHomeWidget> {
                                       hoverColor: Colors.transparent,
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
-                                        if (valueOrDefault<bool>(
-                                                currentUserDocument
-                                                    ?.readyToVote,
-                                                false) ==
-                                            true) {
-                                          context.goNamed('studentVoting');
-                                        }
+                                        context.pushNamed(
+                                          'studentVoting',
+                                          extra: <String, dynamic>{
+                                            kTransitionInfoKey: TransitionInfo(
+                                              hasTransition: true,
+                                              transitionType:
+                                                  PageTransitionType.fade,
+                                              duration:
+                                                  Duration(milliseconds: 0),
+                                            ),
+                                          },
+                                        );
                                       },
                                       child: Row(
                                         mainAxisSize: MainAxisSize.max,

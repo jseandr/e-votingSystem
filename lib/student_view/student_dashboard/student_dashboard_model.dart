@@ -16,8 +16,9 @@ class StudentDashboardModel extends FlutterFlowModel<StudentDashboardWidget> {
 
   final unfocusNode = FocusNode();
   // State field(s) for Timer widget.
-  int timerMilliseconds = 0;
-  String timerValue = StopWatchTimer.getDisplayTime(0, milliSecond: false);
+  int timerMilliseconds = 86400000;
+  String timerValue =
+      StopWatchTimer.getDisplayTime(86400000, milliSecond: false);
   FlutterFlowTimerController timerController =
       FlutterFlowTimerController(StopWatchTimer(mode: StopWatchMode.countDown));
 

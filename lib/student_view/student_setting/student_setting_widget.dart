@@ -360,16 +360,9 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.pushNamed(
-                                  'studentVoting',
-                                  extra: <String, dynamic>{
-                                    kTransitionInfoKey: TransitionInfo(
-                                      hasTransition: true,
-                                      transitionType: PageTransitionType.fade,
-                                      duration: Duration(milliseconds: 0),
-                                    ),
-                                  },
-                                );
+                                if (FFAppState().votingPhaseSwitch != true) {
+                                  context.safePop();
+                                }
                               },
                               child: Container(
                                 width: double.infinity,
@@ -400,19 +393,25 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                           hoverColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
                                           onTap: () async {
-                                            context.goNamed(
-                                              'studentVoting',
-                                              extra: <String, dynamic>{
-                                                kTransitionInfoKey:
-                                                    TransitionInfo(
-                                                  hasTransition: true,
-                                                  transitionType:
-                                                      PageTransitionType.fade,
-                                                  duration:
-                                                      Duration(milliseconds: 0),
-                                                ),
-                                              },
-                                            );
+                                            if (valueOrDefault<bool>(
+                                                    currentUserDocument
+                                                        ?.readyToVote,
+                                                    false) ==
+                                                true) {
+                                              context.pushNamed(
+                                                'studentVoting',
+                                                extra: <String, dynamic>{
+                                                  kTransitionInfoKey:
+                                                      TransitionInfo(
+                                                    hasTransition: true,
+                                                    transitionType:
+                                                        PageTransitionType.fade,
+                                                    duration: Duration(
+                                                        milliseconds: 0),
+                                                  ),
+                                                },
+                                              );
+                                            }
                                           },
                                           child: Text(
                                             'Voting',
@@ -733,16 +732,11 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                       children: [
                                         FFButtonWidget(
                                           onPressed: () async {
-                                            if (currentUserPhoto == '') {
-                                              await FirebaseStorage.instance
-                                                  .refFromURL(currentUserPhoto)
-                                                  .delete();
-                                            } else {
+                                            if (currentUserPhoto != '') {
                                               await FirebaseStorage.instance
                                                   .refFromURL(currentUserPhoto)
                                                   .delete();
                                             }
-
                                             final selectedMedia =
                                                 await selectMediaWithSourceBottomSheet(
                                               context: context,
@@ -1034,25 +1028,8 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                                   : null;
                                           return FFButtonWidget(
                                             onPressed: () async {
-                                              await showDialog(
-                                                context: context,
-                                                builder: (alertDialogContext) {
-                                                  return AlertDialog(
-                                                    content: Text(
-                                                        'Would you like to delete your account?'),
-                                                    actions: [
-                                                      TextButton(
-                                                        onPressed: () =>
-                                                            Navigator.pop(
-                                                                alertDialogContext),
-                                                        child: Text('Ok'),
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                              if (buttonUsersRecord
-                                                      ?.readyToVote ==
+                                              if (FFAppState()
+                                                      .votingPhaseSwitch ==
                                                   true) {
                                                 await showDialog(
                                                   context: context,
@@ -1077,9 +1054,6 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                                     .delete();
                                                 await authManager
                                                     .deleteUser(context);
-                                                await Future.delayed(
-                                                    const Duration(
-                                                        milliseconds: 10000));
                                                 GoRouter.of(context)
                                                     .prepareAuthEvent();
                                                 await authManager.signOut();

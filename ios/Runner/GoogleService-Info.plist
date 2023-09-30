@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyC4D_8YBBuWeVjiEyP92FKZF7pTFqu_BWU</string>
+	<string>AIzaSyBPrVydZ2_8PP_ZbnGpTkrKIjtUiguNTj0</string>
 	<key>GCM_SENDER_ID</key>
-	<string>44127129486</string>
+	<string>949925366032</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.mycompany.bupEVotingSystem</string>
 	<key>PROJECT_ID</key>
-	<string>votingsystem-c80eb</string>
+	<string>bupe-votingsystem</string>
 	<key>STORAGE_BUCKET</key>
-	<string>votingsystem-c80eb.appspot.com</string>
+	<string>bupe-votingsystem.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:44127129486:ios:60c38afb4d56649c3a1edf</string>
+	<string>1:949925366032:ios:c14b428247039aca13fd95</string>
 </dict>
 </plist>

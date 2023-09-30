@@ -35,14 +35,8 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (valueOrDefault<bool>(currentUserDocument?.readyToVote, false) ==
-          true) {
-        context.goNamed('studentVoting');
-      } else {
-        if (valueOrDefault<bool>(currentUserDocument?.doneVote, false) ==
-            true) {
-          context.safePop();
-        }
+      if (FFAppState().votingPhaseSwitch != true) {
+        context.safePop();
       }
     });
   }

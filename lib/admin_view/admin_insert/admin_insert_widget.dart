@@ -678,10 +678,26 @@ class _AdminInsertWidgetState extends State<AdminInsertWidget> {
                                   children: [
                                     FFButtonWidget(
                                       onPressed: () async {
-                                        await rowUsersRecord!.reference
-                                            .update(createUsersRecordData(
-                                          readyToVote: true,
-                                        ));
+                                        setState(() {
+                                          FFAppState().votingPhaseSwitch = true;
+                                        });
+                                        await showDialog(
+                                          context: context,
+                                          builder: (alertDialogContext) {
+                                            return AlertDialog(
+                                              content: Text(
+                                                  'VOTING PHASE IS NOW ON'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                          alertDialogContext),
+                                                  child: Text('Ok'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
                                       },
                                       text: 'On Voting',
                                       options: FFButtonOptions(
@@ -710,10 +726,27 @@ class _AdminInsertWidgetState extends State<AdminInsertWidget> {
                                     ),
                                     FFButtonWidget(
                                       onPressed: () async {
-                                        await rowUsersRecord!.reference
-                                            .update(createUsersRecordData(
-                                          readyToVote: false,
-                                        ));
+                                        setState(() {
+                                          FFAppState().votingPhaseSwitch =
+                                              false;
+                                        });
+                                        await showDialog(
+                                          context: context,
+                                          builder: (alertDialogContext) {
+                                            return AlertDialog(
+                                              content: Text(
+                                                  'VOTING PHASE IS NOW OFF'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                          alertDialogContext),
+                                                  child: Text('Ok'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
                                       },
                                       text: 'Off Voting',
                                       options: FFButtonOptions(
@@ -754,7 +787,7 @@ class _AdminInsertWidgetState extends State<AdminInsertWidget> {
                                 Flexible(
                                   child: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
-                                        24.0, 0.0, 24.0, 40.0),
+                                        24.0, 0.0, 24.0, 0.0),
                                     child: FFButtonWidget(
                                       onPressed: () async {
                                         GoRouter.of(context).prepareAuthEvent();
