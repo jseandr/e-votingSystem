@@ -3,29 +3,28 @@ import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'admin_users_model.dart';
-export 'admin_users_model.dart';
+import 'admin_status_model.dart';
+export 'admin_status_model.dart';
 
-class AdminUsersWidget extends StatefulWidget {
-  const AdminUsersWidget({Key? key}) : super(key: key);
+class AdminStatusWidget extends StatefulWidget {
+  const AdminStatusWidget({Key? key}) : super(key: key);
 
   @override
-  _AdminUsersWidgetState createState() => _AdminUsersWidgetState();
+  _AdminStatusWidgetState createState() => _AdminStatusWidgetState();
 }
 
-class _AdminUsersWidgetState extends State<AdminUsersWidget> {
-  late AdminUsersModel _model;
+class _AdminStatusWidgetState extends State<AdminStatusWidget> {
+  late AdminStatusModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => AdminUsersModel());
+    _model = createModel(context, () => AdminStatusModel());
   }
 
   @override
@@ -469,7 +468,7 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                                         padding: EdgeInsetsDirectional.fromSTEB(
                                             12.0, 0.0, 12.0, 0.0),
                                         child: Icon(
-                                          Icons.manage_accounts,
+                                          Icons.query_stats,
                                           color: Colors.black,
                                           size: 35.0,
                                         ),
@@ -478,7 +477,7 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                                         padding: EdgeInsetsDirectional.fromSTEB(
                                             14.0, 0.0, 0.0, 0.0),
                                         child: Text(
-                                          'Admin Users',
+                                          'Status',
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -600,7 +599,7 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                                           builder: (alertDialogContext) {
                                             return AlertDialog(
                                               content: Text(
-                                                  'VOTING PHASE IS NOW ON'),
+                                                  'VOTING PHASE IS ACTIVE'),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () =>
@@ -613,7 +612,7 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                                           },
                                         );
                                       },
-                                      text: 'On Voting',
+                                      text: 'Voting ON',
                                       options: FFButtonOptions(
                                         height: 40.0,
                                         padding: EdgeInsetsDirectional.fromSTEB(
@@ -649,7 +648,7 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                                           builder: (alertDialogContext) {
                                             return AlertDialog(
                                               content: Text(
-                                                  'VOTING PHASE IS NOW OFF'),
+                                                  'VOTING PHASE IS INACTIVE'),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () =>
@@ -662,7 +661,7 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                                           },
                                         );
                                       },
-                                      text: 'Off Voting',
+                                      text: 'Voting OFF',
                                       options: FFButtonOptions(
                                         height: 40.0,
                                         padding: EdgeInsetsDirectional.fromSTEB(
@@ -880,10 +879,11 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                                     child: Row(
                                       mainAxisSize: MainAxisSize.max,
                                       mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          'Hello, ',
+                                          'STATUS',
+                                          textAlign: TextAlign.center,
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -891,24 +891,9 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                                                 color:
                                                     FlutterFlowTheme.of(context)
                                                         .info,
-                                                fontSize: 22.0,
-                                                fontWeight: FontWeight.bold,
+                                                fontSize: 35.0,
+                                                fontWeight: FontWeight.w900,
                                               ),
-                                        ),
-                                        AuthUserStreamWidget(
-                                          builder: (context) => AutoSizeText(
-                                            currentUserDisplayName,
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  fontFamily: 'Readex Pro',
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .info,
-                                                  fontSize: 22.0,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                          ),
                                         ),
                                       ],
                                     ),
@@ -1053,67 +1038,147 @@ class _AdminUsersWidgetState extends State<AdminUsersWidget> {
                                       ],
                                     ),
                                   ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Marked Done:          ',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              fontFamily: 'Readex Pro',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .info,
-                                              fontSize: 18.0,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                      ),
-                                      FutureBuilder<int>(
-                                        future: queryUsersRecordCount(
-                                          queryBuilder: (usersRecord) =>
-                                              usersRecord.where(
-                                            'done_vote',
-                                            isEqualTo: true,
-                                          ),
-                                        ),
-                                        builder: (context, snapshot) {
-                                          // Customize what your widget looks like when it's loading.
-                                          if (!snapshot.hasData) {
-                                            return Center(
-                                              child: SizedBox(
-                                                width: 50.0,
-                                                height: 50.0,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                          Color>(
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 10.0),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Marked Done:          ',
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                fontFamily: 'Readex Pro',
+                                                color:
                                                     FlutterFlowTheme.of(context)
-                                                        .primary,
+                                                        .info,
+                                                fontSize: 18.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                        ),
+                                        FutureBuilder<int>(
+                                          future: queryUsersRecordCount(
+                                            queryBuilder: (usersRecord) =>
+                                                usersRecord.where(
+                                              'done_vote',
+                                              isEqualTo: true,
+                                            ),
+                                          ),
+                                          builder: (context, snapshot) {
+                                            // Customize what your widget looks like when it's loading.
+                                            if (!snapshot.hasData) {
+                                              return Center(
+                                                child: SizedBox(
+                                                  width: 50.0,
+                                                  height: 50.0,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation<
+                                                            Color>(
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .primary,
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
+                                              );
+                                            }
+                                            int textCount = snapshot.data!;
+                                            return Text(
+                                              textCount.toString(),
+                                              style: FlutterFlowTheme.of(
+                                                      context)
+                                                  .bodyMedium
+                                                  .override(
+                                                    fontFamily: 'Readex Pro',
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .info,
+                                                    fontSize: 16.0,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
                                             );
-                                          }
-                                          int textCount = snapshot.data!;
-                                          return Text(
-                                            textCount.toString(),
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  fontFamily: 'Readex Pro',
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .info,
-                                                  fontSize: 16.0,
-                                                  fontWeight: FontWeight.normal,
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Voting Phase:          ',
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                fontFamily: 'Readex Pro',
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .info,
+                                                fontSize: 18.0,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                        ),
+                                        FutureBuilder<int>(
+                                          future: queryUsersRecordCount(
+                                            queryBuilder: (usersRecord) =>
+                                                usersRecord.where(
+                                              'done_vote',
+                                              isEqualTo: true,
+                                            ),
+                                          ),
+                                          builder: (context, snapshot) {
+                                            // Customize what your widget looks like when it's loading.
+                                            if (!snapshot.hasData) {
+                                              return Center(
+                                                child: SizedBox(
+                                                  width: 50.0,
+                                                  height: 50.0,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation<
+                                                            Color>(
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .primary,
+                                                    ),
+                                                  ),
                                                 ),
-                                          );
-                                        },
-                                      ),
-                                    ],
+                                              );
+                                            }
+                                            int textCount = snapshot.data!;
+                                            return Text(
+                                              FFAppState().votingPhaseSwitch ==
+                                                      true
+                                                  ? 'ACTIVE'
+                                                  : 'INACTIVE',
+                                              style: FlutterFlowTheme.of(
+                                                      context)
+                                                  .bodyMedium
+                                                  .override(
+                                                    fontFamily: 'Readex Pro',
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .info,
+                                                    fontSize: 16.0,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(

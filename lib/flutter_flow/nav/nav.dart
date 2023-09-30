@@ -120,9 +120,9 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => AdminSettingWidget(),
         ),
         FFRoute(
-          name: 'adminUsers',
-          path: '/adminUsers',
-          builder: (context, params) => AdminUsersWidget(),
+          name: 'adminStatus',
+          path: '/adminStatus',
+          builder: (context, params) => AdminStatusWidget(),
         ),
         FFRoute(
           name: 'adminInsert',

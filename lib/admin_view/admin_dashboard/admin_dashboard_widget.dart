@@ -1,10 +1,8 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_timer.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,8 +26,6 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => AdminDashboardModel());
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
 
   @override
@@ -439,7 +435,7 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                               highlightColor: Colors.transparent,
                               onTap: () async {
                                 context.pushNamed(
-                                  'adminUsers',
+                                  'adminStatus',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
                                       hasTransition: true,
@@ -464,7 +460,7 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                                         padding: EdgeInsetsDirectional.fromSTEB(
                                             12.0, 0.0, 12.0, 0.0),
                                         child: Icon(
-                                          Icons.manage_accounts,
+                                          Icons.query_stats,
                                           color: Colors.black,
                                           size: 35.0,
                                         ),
@@ -473,7 +469,7 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                                         padding: EdgeInsetsDirectional.fromSTEB(
                                             14.0, 0.0, 0.0, 0.0),
                                         child: Text(
-                                          'Admin Users',
+                                          'Status',
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -593,7 +589,7 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                                           builder: (alertDialogContext) {
                                             return AlertDialog(
                                               content: Text(
-                                                  'VOTING PHASE IS NOW ON'),
+                                                  'VOTING PHASE IS ACTIVE'),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () =>
@@ -606,7 +602,7 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                                           },
                                         );
                                       },
-                                      text: 'On Voting',
+                                      text: 'Voting ON',
                                       options: FFButtonOptions(
                                         height: 40.0,
                                         padding: EdgeInsetsDirectional.fromSTEB(
@@ -642,7 +638,7 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                                           builder: (alertDialogContext) {
                                             return AlertDialog(
                                               content: Text(
-                                                  'VOTING PHASE IS NOW OFF'),
+                                                  'VOTING PHASE IS INACTIVE'),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () =>
@@ -655,7 +651,7 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                                           },
                                         );
                                       },
-                                      text: 'Off Voting',
+                                      text: 'Voting OFF',
                                       options: FFButtonOptions(
                                         height: 40.0,
                                         padding: EdgeInsetsDirectional.fromSTEB(
@@ -873,70 +869,6 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                               Divider(
                                 thickness: 1.0,
                                 color: Color(0xFF95A1AC),
-                              ),
-                              Container(
-                                width: 250.0,
-                                height: 60.0,
-                                decoration: BoxDecoration(),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'COUNTDOWN OF VOTING PHASE',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .info,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        FlutterFlowTimer(
-                                          initialTime: _model.timerMilliseconds,
-                                          getDisplayTime: (value) =>
-                                              StopWatchTimer.getDisplayTime(
-                                                  value,
-                                                  milliSecond: false),
-                                          controller: _model.timerController,
-                                          updateStateInterval:
-                                              Duration(milliseconds: 1000),
-                                          onChanged: (value, displayTime,
-                                              shouldUpdate) {
-                                            _model.timerMilliseconds = value;
-                                            _model.timerValue = displayTime;
-                                            if (shouldUpdate) setState(() {});
-                                          },
-                                          onEnded: () async {
-                                            _model.timerController
-                                                .onStartTimer();
-                                          },
-                                          textAlign: TextAlign.start,
-                                          style: FlutterFlowTheme.of(context)
-                                              .headlineSmall
-                                              .override(
-                                                fontFamily: 'Outfit',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
                               ),
                               Expanded(
                                 child: Padding(

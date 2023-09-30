@@ -86,7 +86,6 @@ dependencies:
   sign_in_with_apple_web: 1.0.1
   simple_gradient_text: 1.2.3
   sqflite: 2.2.6
-  stop_watch_timer: 3.0.2
   stream_transform: 2.1.0
   text_search: 0.0.2
   timeago: 3.2.2

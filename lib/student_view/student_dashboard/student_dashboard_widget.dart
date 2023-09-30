@@ -1,10 +1,8 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
-import '/flutter_flow/flutter_flow_timer.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -36,8 +34,6 @@ class _StudentDashboardWidgetState extends State<StudentDashboardWidget> {
         context.safePop();
       }
     });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
 
   @override
@@ -712,70 +708,6 @@ class _StudentDashboardWidgetState extends State<StudentDashboardWidget> {
                               Divider(
                                 thickness: 1.0,
                                 color: Color(0xFF95A1AC),
-                              ),
-                              Container(
-                                width: 250.0,
-                                height: 60.0,
-                                decoration: BoxDecoration(),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'COUNTDOWN OF VOTING PHASE',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .info,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        FlutterFlowTimer(
-                                          initialTime: _model.timerMilliseconds,
-                                          getDisplayTime: (value) =>
-                                              StopWatchTimer.getDisplayTime(
-                                                  value,
-                                                  milliSecond: false),
-                                          controller: _model.timerController,
-                                          updateStateInterval:
-                                              Duration(milliseconds: 1000),
-                                          onChanged: (value, displayTime,
-                                              shouldUpdate) {
-                                            _model.timerMilliseconds = value;
-                                            _model.timerValue = displayTime;
-                                            if (shouldUpdate) setState(() {});
-                                          },
-                                          onEnded: () async {
-                                            _model.timerController
-                                                .onStartTimer();
-                                          },
-                                          textAlign: TextAlign.start,
-                                          style: FlutterFlowTheme.of(context)
-                                              .headlineSmall
-                                              .override(
-                                                fontFamily: 'Outfit',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primary,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
                               ),
                               Expanded(
                                 child: Padding(

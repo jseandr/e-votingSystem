@@ -9,7 +9,8 @@ export '/login_signup/reset_password/reset_password_widget.dart'
     show ResetPasswordWidget;
 export '/admin_view/admin_setting/admin_setting_widget.dart'
     show AdminSettingWidget;
-export '/admin_view/admin_users/admin_users_widget.dart' show AdminUsersWidget;
+export '/admin_view/admin_status/admin_status_widget.dart'
+    show AdminStatusWidget;
 export '/admin_view/admin_insert/admin_insert_widget.dart'
     show AdminInsertWidget;
 export '/student_view/student_voting/student_voting_widget.dart'

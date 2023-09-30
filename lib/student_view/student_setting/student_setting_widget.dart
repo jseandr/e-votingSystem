@@ -1044,8 +1044,6 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                                 );
                                                 context.safePop();
                                               } else {
-                                                await currentUserReference!
-                                                    .delete();
                                                 await authManager
                                                     .deleteUser(context);
                                                 GoRouter.of(context)
@@ -1053,6 +1051,10 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                                 await authManager.signOut();
                                                 GoRouter.of(context)
                                                     .clearRedirectLocation();
+
+                                                context.pushNamedAuth(
+                                                    'loginpage',
+                                                    context.mounted);
                                               }
                                             },
                                             text: 'Delete Account',

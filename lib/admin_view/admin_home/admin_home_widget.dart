@@ -442,7 +442,7 @@ class _AdminHomeWidgetState extends State<AdminHomeWidget> {
                               highlightColor: Colors.transparent,
                               onTap: () async {
                                 context.pushNamed(
-                                  'adminUsers',
+                                  'adminStatus',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
                                       hasTransition: true,
@@ -467,7 +467,7 @@ class _AdminHomeWidgetState extends State<AdminHomeWidget> {
                                         padding: EdgeInsetsDirectional.fromSTEB(
                                             12.0, 0.0, 12.0, 0.0),
                                         child: Icon(
-                                          Icons.manage_accounts,
+                                          Icons.query_stats,
                                           color: Colors.black,
                                           size: 35.0,
                                         ),
@@ -476,7 +476,7 @@ class _AdminHomeWidgetState extends State<AdminHomeWidget> {
                                         padding: EdgeInsetsDirectional.fromSTEB(
                                             14.0, 0.0, 0.0, 0.0),
                                         child: Text(
-                                          'Admin Users',
+                                          'Status',
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -596,7 +596,7 @@ class _AdminHomeWidgetState extends State<AdminHomeWidget> {
                                           builder: (alertDialogContext) {
                                             return AlertDialog(
                                               content: Text(
-                                                  'VOTING PHASE IS NOW ON'),
+                                                  'VOTING PHASE IS ACTIVE'),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () =>
@@ -609,7 +609,7 @@ class _AdminHomeWidgetState extends State<AdminHomeWidget> {
                                           },
                                         );
                                       },
-                                      text: 'On Voting',
+                                      text: 'Voting ON',
                                       options: FFButtonOptions(
                                         height: 40.0,
                                         padding: EdgeInsetsDirectional.fromSTEB(
@@ -645,7 +645,7 @@ class _AdminHomeWidgetState extends State<AdminHomeWidget> {
                                           builder: (alertDialogContext) {
                                             return AlertDialog(
                                               content: Text(
-                                                  'VOTING PHASE IS NOW OFF'),
+                                                  'VOTING PHASE IS INACTIVE'),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () =>
@@ -658,7 +658,7 @@ class _AdminHomeWidgetState extends State<AdminHomeWidget> {
                                           },
                                         );
                                       },
-                                      text: 'Off Voting',
+                                      text: 'Voting OFF',
                                       options: FFButtonOptions(
                                         height: 40.0,
                                         padding: EdgeInsetsDirectional.fromSTEB(
@@ -884,7 +884,7 @@ class _AdminHomeWidgetState extends State<AdminHomeWidget> {
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Text(
-                                      'Hello, ',
+                                      'WELCOME, ',
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -1195,7 +1195,7 @@ class _AdminHomeWidgetState extends State<AdminHomeWidget> {
                                             hoverColor: Colors.transparent,
                                             highlightColor: Colors.transparent,
                                             onTap: () async {
-                                              context.goNamed('adminUsers');
+                                              context.goNamed('adminStatus');
                                             },
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
@@ -1224,8 +1224,7 @@ class _AdminHomeWidgetState extends State<AdminHomeWidget> {
                                                                 .primaryBackground,
                                                           ),
                                                           child: Icon(
-                                                            Icons
-                                                                .manage_accounts,
+                                                            Icons.query_stats,
                                                             color: FlutterFlowTheme
                                                                     .of(context)
                                                                 .info,
@@ -1257,7 +1256,7 @@ class _AdminHomeWidgetState extends State<AdminHomeWidget> {
                                                                           .center,
                                                                   children: [
                                                                     Text(
-                                                                      'ADMIN USERS',
+                                                                      'STATUS',
                                                                       textAlign:
                                                                           TextAlign
                                                                               .justify,
@@ -1294,7 +1293,7 @@ class _AdminHomeWidgetState extends State<AdminHomeWidget> {
                                                                           .center,
                                                                   children: [
                                                                     Text(
-                                                                      'Counts of Admin and Users',
+                                                                      'View the status',
                                                                       textAlign:
                                                                           TextAlign
                                                                               .justify,

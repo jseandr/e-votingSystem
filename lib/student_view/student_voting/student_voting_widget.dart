@@ -868,71 +868,119 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update({
-                                                                                    ...createUsersRecordData(
-                                                                                      presVote: true,
-                                                                                    ),
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'presDataList': FieldValue.arrayUnion([
-                                                                                          getRepsInfoFirestoreData(
-                                                                                            updateRepsInfoStruct(
-                                                                                              RepsInfoStruct(
-                                                                                                photoUrl: listViewUsersRecord.photoUrl,
-                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                  var confirmDialogResponse = await showDialog<bool>(
+                                                                                        context: context,
+                                                                                        builder: (alertDialogContext) {
+                                                                                          return AlertDialog(
+                                                                                            title: Text('Are you sure want to vote?'),
+                                                                                            content: Text(listViewUsersRecord.displayName),
+                                                                                            actions: [
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                                                child: Text('Cancel'),
                                                                                               ),
-                                                                                              clearUnsetFields: false,
-                                                                                            ),
-                                                                                            true,
-                                                                                          )
-                                                                                        ]),
-                                                                                      },
-                                                                                    ),
-                                                                                  });
-                                                                                  setState(() {});
-
-                                                                                  await listViewUsersRecord.reference.update({
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'voteCount': FieldValue.increment(1),
-                                                                                      },
-                                                                                    ),
-                                                                                  });
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    SnackBar(
-                                                                                      content: Text(
-                                                                                        'President Voted',
-                                                                                        style: TextStyle(
-                                                                                          color: FlutterFlowTheme.of(context).primaryText,
-                                                                                        ),
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                                                child: Text('Confirm'),
+                                                                                              ),
+                                                                                            ],
+                                                                                          );
+                                                                                        },
+                                                                                      ) ??
+                                                                                      false;
+                                                                                  if (confirmDialogResponse) {
+                                                                                    await currentUserReference!.update({
+                                                                                      ...createUsersRecordData(
+                                                                                        presVote: true,
                                                                                       ),
-                                                                                      duration: Duration(milliseconds: 500),
-                                                                                      backgroundColor: FlutterFlowTheme.of(context).secondary,
-                                                                                    ),
-                                                                                  );
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'presDataList': FieldValue.arrayUnion([
+                                                                                            getRepsInfoFirestoreData(
+                                                                                              updateRepsInfoStruct(
+                                                                                                RepsInfoStruct(
+                                                                                                  photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                  displayName: listViewUsersRecord.displayName,
+                                                                                                ),
+                                                                                                clearUnsetFields: false,
+                                                                                              ),
+                                                                                              true,
+                                                                                            )
+                                                                                          ]),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                    setState(() {});
+
+                                                                                    await listViewUsersRecord.reference.update({
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'voteCount': FieldValue.increment(1),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                                      SnackBar(
+                                                                                        content: Text(
+                                                                                          'President Voted',
+                                                                                          style: TextStyle(
+                                                                                            color: FlutterFlowTheme.of(context).primaryText,
+                                                                                          ),
+                                                                                        ),
+                                                                                        duration: Duration(milliseconds: 500),
+                                                                                        backgroundColor: FlutterFlowTheme.of(context).secondary,
+                                                                                      ),
+                                                                                    );
+                                                                                  } else {
+                                                                                    if (Navigator.of(context).canPop()) {
+                                                                                      context.pop();
+                                                                                    }
+                                                                                    context.pushNamed(
+                                                                                      'studentVoting',
+                                                                                      extra: <String, dynamic>{
+                                                                                        kTransitionInfoKey: TransitionInfo(
+                                                                                          hasTransition: true,
+                                                                                          transitionType: PageTransitionType.fade,
+                                                                                          duration: Duration(milliseconds: 0),
+                                                                                        ),
+                                                                                      },
+                                                                                    );
+                                                                                  }
                                                                                 }
                                                                               },
                                                                               child: Column(
                                                                                 mainAxisSize: MainAxisSize.max,
                                                                                 children: [
-                                                                                  ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(8.0),
-                                                                                    child: Image.network(
-                                                                                      valueOrDefault<String>(
-                                                                                        listViewUsersRecord.photoUrl,
-                                                                                        'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
-                                                                                      ),
-                                                                                      width: 100.0,
-                                                                                      height: 100.0,
-                                                                                      fit: BoxFit.cover,
-                                                                                    ),
-                                                                                  ),
-                                                                                  AutoSizeText(
-                                                                                    listViewUsersRecord.displayName,
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                          fontFamily: 'Readex Pro',
-                                                                                          color: FlutterFlowTheme.of(context).info,
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                        child: Image.network(
+                                                                                          valueOrDefault<String>(
+                                                                                            listViewUsersRecord.photoUrl,
+                                                                                            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                          ),
+                                                                                          width: 100.0,
+                                                                                          height: 100.0,
+                                                                                          fit: BoxFit.cover,
                                                                                         ),
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      AutoSizeText(
+                                                                                        listViewUsersRecord.displayName,
+                                                                                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                                                              fontFamily: 'Readex Pro',
+                                                                                              color: FlutterFlowTheme.of(context).info,
+                                                                                            ),
+                                                                                      ),
+                                                                                    ],
                                                                                   ),
                                                                                 ],
                                                                               ),
@@ -964,7 +1012,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     return Row(
                                                                       mainAxisSize:
                                                                           MainAxisSize
-                                                                              .min,
+                                                                              .max,
                                                                       mainAxisAlignment:
                                                                           MainAxisAlignment
                                                                               .center,
@@ -986,27 +1034,39 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
-                                                                                ClipRRect(
-                                                                                  borderRadius: BorderRadius.circular(8.0),
-                                                                                  child: Image.network(
-                                                                                    presNameItem.photoUrl,
-                                                                                    width: 100.0,
-                                                                                    height: 100.0,
-                                                                                    fit: BoxFit.cover,
-                                                                                  ),
-                                                                                ),
-                                                                                GradientText(
-                                                                                  presNameItem.displayName,
-                                                                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                        fontFamily: 'Readex Pro',
-                                                                                        color: FlutterFlowTheme.of(context).info,
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    ClipRRect(
+                                                                                      borderRadius: BorderRadius.circular(8.0),
+                                                                                      child: Image.network(
+                                                                                        presNameItem.photoUrl,
+                                                                                        width: 100.0,
+                                                                                        height: 100.0,
+                                                                                        fit: BoxFit.cover,
                                                                                       ),
-                                                                                  colors: [
-                                                                                    FlutterFlowTheme.of(context).primary,
-                                                                                    FlutterFlowTheme.of(context).secondary
+                                                                                    ),
                                                                                   ],
-                                                                                  gradientDirection: GradientDirection.ltr,
-                                                                                  gradientType: GradientType.linear,
+                                                                                ),
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                                                  children: [
+                                                                                    GradientText(
+                                                                                      presNameItem.displayName,
+                                                                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                                                            fontFamily: 'Readex Pro',
+                                                                                            color: FlutterFlowTheme.of(context).info,
+                                                                                          ),
+                                                                                      colors: [
+                                                                                        FlutterFlowTheme.of(context).primary,
+                                                                                        FlutterFlowTheme.of(context).secondary
+                                                                                      ],
+                                                                                      gradientDirection: GradientDirection.ltr,
+                                                                                      gradientType: GradientType.linear,
+                                                                                    ),
+                                                                                  ],
                                                                                 ),
                                                                               ],
                                                                             ),
@@ -1163,56 +1223,104 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update({
-                                                                                    ...createUsersRecordData(
-                                                                                      vpresVote: true,
-                                                                                    ),
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'vicePresDataList': FieldValue.arrayUnion([
-                                                                                          getRepsInfoFirestoreData(
-                                                                                            updateRepsInfoStruct(
-                                                                                              RepsInfoStruct(
-                                                                                                photoUrl: listViewUsersRecord.photoUrl,
-                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                  var confirmDialogResponse = await showDialog<bool>(
+                                                                                        context: context,
+                                                                                        builder: (alertDialogContext) {
+                                                                                          return AlertDialog(
+                                                                                            title: Text('Are you sure you want to vote?'),
+                                                                                            content: Text(listViewUsersRecord.displayName),
+                                                                                            actions: [
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                                                child: Text('Cancel'),
                                                                                               ),
-                                                                                              clearUnsetFields: false,
-                                                                                            ),
-                                                                                            true,
-                                                                                          )
-                                                                                        ]),
-                                                                                      },
-                                                                                    ),
-                                                                                  });
-                                                                                  setState(() {});
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                                                child: Text('Confirm'),
+                                                                                              ),
+                                                                                            ],
+                                                                                          );
+                                                                                        },
+                                                                                      ) ??
+                                                                                      false;
+                                                                                  if (confirmDialogResponse) {
+                                                                                    await currentUserReference!.update({
+                                                                                      ...createUsersRecordData(
+                                                                                        vpresVote: true,
+                                                                                      ),
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'vicePresDataList': FieldValue.arrayUnion([
+                                                                                            getRepsInfoFirestoreData(
+                                                                                              updateRepsInfoStruct(
+                                                                                                RepsInfoStruct(
+                                                                                                  photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                  displayName: listViewUsersRecord.displayName,
+                                                                                                ),
+                                                                                                clearUnsetFields: false,
+                                                                                              ),
+                                                                                              true,
+                                                                                            )
+                                                                                          ]),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                    setState(() {});
 
-                                                                                  await listViewUsersRecord.reference.update({
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                    await listViewUsersRecord.reference.update({
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'voteCount': FieldValue.increment(1),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                  } else {
+                                                                                    if (Navigator.of(context).canPop()) {
+                                                                                      context.pop();
+                                                                                    }
+                                                                                    context.pushNamed(
+                                                                                      'studentVoting',
+                                                                                      extra: <String, dynamic>{
+                                                                                        kTransitionInfoKey: TransitionInfo(
+                                                                                          hasTransition: true,
+                                                                                          transitionType: PageTransitionType.fade,
+                                                                                          duration: Duration(milliseconds: 0),
+                                                                                        ),
                                                                                       },
-                                                                                    ),
-                                                                                  });
+                                                                                    );
+                                                                                  }
                                                                                 }
                                                                               },
                                                                               child: Column(
                                                                                 mainAxisSize: MainAxisSize.max,
                                                                                 children: [
-                                                                                  ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(8.0),
-                                                                                    child: Image.network(
-                                                                                      valueOrDefault<String>(
-                                                                                        listViewUsersRecord.photoUrl,
-                                                                                        'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                        child: Image.network(
+                                                                                          valueOrDefault<String>(
+                                                                                            listViewUsersRecord.photoUrl,
+                                                                                            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                          ),
+                                                                                          width: 100.0,
+                                                                                          height: 100.0,
+                                                                                          fit: BoxFit.cover,
+                                                                                        ),
                                                                                       ),
-                                                                                      width: 100.0,
-                                                                                      height: 100.0,
-                                                                                      fit: BoxFit.cover,
-                                                                                    ),
+                                                                                    ],
                                                                                   ),
-                                                                                  AutoSizeText(
-                                                                                    listViewUsersRecord.displayName,
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      AutoSizeText(
+                                                                                        listViewUsersRecord.displayName,
+                                                                                        style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                      ),
+                                                                                    ],
                                                                                   ),
                                                                                 ],
                                                                               ),
@@ -1244,7 +1352,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     return Row(
                                                                       mainAxisSize:
                                                                           MainAxisSize
-                                                                              .min,
+                                                                              .max,
                                                                       mainAxisAlignment:
                                                                           MainAxisAlignment
                                                                               .center,
@@ -1266,33 +1374,45 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
-                                                                                Align(
-                                                                                  alignment: AlignmentDirectional(0.00, 0.00),
-                                                                                  child: ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(8.0),
-                                                                                    child: Image.network(
-                                                                                      valueOrDefault<String>(
-                                                                                        vicePresNameItem.photoUrl,
-                                                                                        'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    Align(
+                                                                                      alignment: AlignmentDirectional(0.00, 0.00),
+                                                                                      child: ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                        child: Image.network(
+                                                                                          valueOrDefault<String>(
+                                                                                            vicePresNameItem.photoUrl,
+                                                                                            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                          ),
+                                                                                          width: 100.0,
+                                                                                          height: 100.0,
+                                                                                          fit: BoxFit.cover,
+                                                                                        ),
                                                                                       ),
-                                                                                      width: 100.0,
-                                                                                      height: 100.0,
-                                                                                      fit: BoxFit.cover,
                                                                                     ),
-                                                                                  ),
-                                                                                ),
-                                                                                GradientText(
-                                                                                  vicePresNameItem.displayName,
-                                                                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                        fontFamily: 'Readex Pro',
-                                                                                        color: FlutterFlowTheme.of(context).info,
-                                                                                      ),
-                                                                                  colors: [
-                                                                                    FlutterFlowTheme.of(context).primary,
-                                                                                    FlutterFlowTheme.of(context).secondary
                                                                                   ],
-                                                                                  gradientDirection: GradientDirection.ltr,
-                                                                                  gradientType: GradientType.linear,
+                                                                                ),
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    GradientText(
+                                                                                      vicePresNameItem.displayName,
+                                                                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                                                            fontFamily: 'Readex Pro',
+                                                                                            color: FlutterFlowTheme.of(context).info,
+                                                                                          ),
+                                                                                      colors: [
+                                                                                        FlutterFlowTheme.of(context).primary,
+                                                                                        FlutterFlowTheme.of(context).secondary
+                                                                                      ],
+                                                                                      gradientDirection: GradientDirection.ltr,
+                                                                                      gradientType: GradientType.linear,
+                                                                                    ),
+                                                                                  ],
                                                                                 ),
                                                                               ],
                                                                             ),
@@ -1449,56 +1569,104 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update({
-                                                                                    ...createUsersRecordData(
-                                                                                      secVote: true,
-                                                                                    ),
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'secDataList': FieldValue.arrayUnion([
-                                                                                          getRepsInfoFirestoreData(
-                                                                                            updateRepsInfoStruct(
-                                                                                              RepsInfoStruct(
-                                                                                                photoUrl: listViewUsersRecord.photoUrl,
-                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                  var confirmDialogResponse = await showDialog<bool>(
+                                                                                        context: context,
+                                                                                        builder: (alertDialogContext) {
+                                                                                          return AlertDialog(
+                                                                                            title: Text('Are you sure you want to vote?'),
+                                                                                            content: Text(listViewUsersRecord.displayName),
+                                                                                            actions: [
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                                                child: Text('Cancel'),
                                                                                               ),
-                                                                                              clearUnsetFields: false,
-                                                                                            ),
-                                                                                            true,
-                                                                                          )
-                                                                                        ]),
-                                                                                      },
-                                                                                    ),
-                                                                                  });
-                                                                                  setState(() {});
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                                                child: Text('Confirm'),
+                                                                                              ),
+                                                                                            ],
+                                                                                          );
+                                                                                        },
+                                                                                      ) ??
+                                                                                      false;
+                                                                                  if (confirmDialogResponse) {
+                                                                                    await currentUserReference!.update({
+                                                                                      ...createUsersRecordData(
+                                                                                        secVote: true,
+                                                                                      ),
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'secDataList': FieldValue.arrayUnion([
+                                                                                            getRepsInfoFirestoreData(
+                                                                                              updateRepsInfoStruct(
+                                                                                                RepsInfoStruct(
+                                                                                                  photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                  displayName: listViewUsersRecord.displayName,
+                                                                                                ),
+                                                                                                clearUnsetFields: false,
+                                                                                              ),
+                                                                                              true,
+                                                                                            )
+                                                                                          ]),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                    setState(() {});
 
-                                                                                  await listViewUsersRecord.reference.update({
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                    await listViewUsersRecord.reference.update({
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'voteCount': FieldValue.increment(1),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                  } else {
+                                                                                    if (Navigator.of(context).canPop()) {
+                                                                                      context.pop();
+                                                                                    }
+                                                                                    context.pushNamed(
+                                                                                      'studentVoting',
+                                                                                      extra: <String, dynamic>{
+                                                                                        kTransitionInfoKey: TransitionInfo(
+                                                                                          hasTransition: true,
+                                                                                          transitionType: PageTransitionType.fade,
+                                                                                          duration: Duration(milliseconds: 0),
+                                                                                        ),
                                                                                       },
-                                                                                    ),
-                                                                                  });
+                                                                                    );
+                                                                                  }
                                                                                 }
                                                                               },
                                                                               child: Column(
                                                                                 mainAxisSize: MainAxisSize.max,
                                                                                 children: [
-                                                                                  ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(8.0),
-                                                                                    child: Image.network(
-                                                                                      valueOrDefault<String>(
-                                                                                        listViewUsersRecord.photoUrl,
-                                                                                        'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                        child: Image.network(
+                                                                                          valueOrDefault<String>(
+                                                                                            listViewUsersRecord.photoUrl,
+                                                                                            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                          ),
+                                                                                          width: 100.0,
+                                                                                          height: 100.0,
+                                                                                          fit: BoxFit.cover,
+                                                                                        ),
                                                                                       ),
-                                                                                      width: 100.0,
-                                                                                      height: 100.0,
-                                                                                      fit: BoxFit.cover,
-                                                                                    ),
+                                                                                    ],
                                                                                   ),
-                                                                                  AutoSizeText(
-                                                                                    listViewUsersRecord.displayName,
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      AutoSizeText(
+                                                                                        listViewUsersRecord.displayName,
+                                                                                        style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                      ),
+                                                                                    ],
                                                                                   ),
                                                                                 ],
                                                                               ),
@@ -1530,7 +1698,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     return Row(
                                                                       mainAxisSize:
                                                                           MainAxisSize
-                                                                              .min,
+                                                                              .max,
                                                                       mainAxisAlignment:
                                                                           MainAxisAlignment
                                                                               .center,
@@ -1552,33 +1720,44 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
-                                                                                Align(
-                                                                                  alignment: AlignmentDirectional(0.00, 0.00),
-                                                                                  child: ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(8.0),
-                                                                                    child: Image.network(
-                                                                                      valueOrDefault<String>(
-                                                                                        secNameItem.photoUrl,
-                                                                                        'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    Align(
+                                                                                      alignment: AlignmentDirectional(0.00, 0.00),
+                                                                                      child: ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                        child: Image.network(
+                                                                                          valueOrDefault<String>(
+                                                                                            secNameItem.photoUrl,
+                                                                                            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                          ),
+                                                                                          width: 100.0,
+                                                                                          height: 100.0,
+                                                                                          fit: BoxFit.cover,
+                                                                                        ),
                                                                                       ),
-                                                                                      width: 100.0,
-                                                                                      height: 100.0,
-                                                                                      fit: BoxFit.cover,
                                                                                     ),
-                                                                                  ),
-                                                                                ),
-                                                                                GradientText(
-                                                                                  secNameItem.displayName,
-                                                                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                        fontFamily: 'Readex Pro',
-                                                                                        color: FlutterFlowTheme.of(context).info,
-                                                                                      ),
-                                                                                  colors: [
-                                                                                    FlutterFlowTheme.of(context).primary,
-                                                                                    FlutterFlowTheme.of(context).secondary
                                                                                   ],
-                                                                                  gradientDirection: GradientDirection.ltr,
-                                                                                  gradientType: GradientType.linear,
+                                                                                ),
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  children: [
+                                                                                    GradientText(
+                                                                                      secNameItem.displayName,
+                                                                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                                                            fontFamily: 'Readex Pro',
+                                                                                            color: FlutterFlowTheme.of(context).info,
+                                                                                          ),
+                                                                                      colors: [
+                                                                                        FlutterFlowTheme.of(context).primary,
+                                                                                        FlutterFlowTheme.of(context).secondary
+                                                                                      ],
+                                                                                      gradientDirection: GradientDirection.ltr,
+                                                                                      gradientType: GradientType.linear,
+                                                                                    ),
+                                                                                  ],
                                                                                 ),
                                                                               ],
                                                                             ),
@@ -1735,56 +1914,104 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update({
-                                                                                    ...createUsersRecordData(
-                                                                                      treasVote: true,
-                                                                                    ),
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'treasurerDataList': FieldValue.arrayUnion([
-                                                                                          getRepsInfoFirestoreData(
-                                                                                            updateRepsInfoStruct(
-                                                                                              RepsInfoStruct(
-                                                                                                photoUrl: listViewUsersRecord.photoUrl,
-                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                  var confirmDialogResponse = await showDialog<bool>(
+                                                                                        context: context,
+                                                                                        builder: (alertDialogContext) {
+                                                                                          return AlertDialog(
+                                                                                            title: Text('Are you sure you want to vote?'),
+                                                                                            content: Text(listViewUsersRecord.displayName),
+                                                                                            actions: [
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                                                child: Text('Cancel'),
                                                                                               ),
-                                                                                              clearUnsetFields: false,
-                                                                                            ),
-                                                                                            true,
-                                                                                          )
-                                                                                        ]),
-                                                                                      },
-                                                                                    ),
-                                                                                  });
-                                                                                  setState(() {});
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                                                child: Text('Confirm'),
+                                                                                              ),
+                                                                                            ],
+                                                                                          );
+                                                                                        },
+                                                                                      ) ??
+                                                                                      false;
+                                                                                  if (confirmDialogResponse) {
+                                                                                    await currentUserReference!.update({
+                                                                                      ...createUsersRecordData(
+                                                                                        treasVote: true,
+                                                                                      ),
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'treasurerDataList': FieldValue.arrayUnion([
+                                                                                            getRepsInfoFirestoreData(
+                                                                                              updateRepsInfoStruct(
+                                                                                                RepsInfoStruct(
+                                                                                                  photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                  displayName: listViewUsersRecord.displayName,
+                                                                                                ),
+                                                                                                clearUnsetFields: false,
+                                                                                              ),
+                                                                                              true,
+                                                                                            )
+                                                                                          ]),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                    setState(() {});
 
-                                                                                  await listViewUsersRecord.reference.update({
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                    await listViewUsersRecord.reference.update({
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'voteCount': FieldValue.increment(1),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                  } else {
+                                                                                    if (Navigator.of(context).canPop()) {
+                                                                                      context.pop();
+                                                                                    }
+                                                                                    context.pushNamed(
+                                                                                      'studentVoting',
+                                                                                      extra: <String, dynamic>{
+                                                                                        kTransitionInfoKey: TransitionInfo(
+                                                                                          hasTransition: true,
+                                                                                          transitionType: PageTransitionType.fade,
+                                                                                          duration: Duration(milliseconds: 0),
+                                                                                        ),
                                                                                       },
-                                                                                    ),
-                                                                                  });
+                                                                                    );
+                                                                                  }
                                                                                 }
                                                                               },
                                                                               child: Column(
                                                                                 mainAxisSize: MainAxisSize.max,
                                                                                 children: [
-                                                                                  ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(8.0),
-                                                                                    child: Image.network(
-                                                                                      valueOrDefault<String>(
-                                                                                        listViewUsersRecord.photoUrl,
-                                                                                        'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                        child: Image.network(
+                                                                                          valueOrDefault<String>(
+                                                                                            listViewUsersRecord.photoUrl,
+                                                                                            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                          ),
+                                                                                          width: 100.0,
+                                                                                          height: 100.0,
+                                                                                          fit: BoxFit.cover,
+                                                                                        ),
                                                                                       ),
-                                                                                      width: 100.0,
-                                                                                      height: 100.0,
-                                                                                      fit: BoxFit.cover,
-                                                                                    ),
+                                                                                    ],
                                                                                   ),
-                                                                                  AutoSizeText(
-                                                                                    listViewUsersRecord.displayName,
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      AutoSizeText(
+                                                                                        listViewUsersRecord.displayName,
+                                                                                        style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                      ),
+                                                                                    ],
                                                                                   ),
                                                                                 ],
                                                                               ),
@@ -1816,7 +2043,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     return Row(
                                                                       mainAxisSize:
                                                                           MainAxisSize
-                                                                              .min,
+                                                                              .max,
                                                                       mainAxisAlignment:
                                                                           MainAxisAlignment
                                                                               .center,
@@ -1838,33 +2065,45 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
-                                                                                Align(
-                                                                                  alignment: AlignmentDirectional(0.00, 0.00),
-                                                                                  child: ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(8.0),
-                                                                                    child: Image.network(
-                                                                                      valueOrDefault<String>(
-                                                                                        treasurerNameItem.photoUrl,
-                                                                                        'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    Align(
+                                                                                      alignment: AlignmentDirectional(0.00, 0.00),
+                                                                                      child: ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                        child: Image.network(
+                                                                                          valueOrDefault<String>(
+                                                                                            treasurerNameItem.photoUrl,
+                                                                                            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                          ),
+                                                                                          width: 100.0,
+                                                                                          height: 100.0,
+                                                                                          fit: BoxFit.cover,
+                                                                                        ),
                                                                                       ),
-                                                                                      width: 100.0,
-                                                                                      height: 100.0,
-                                                                                      fit: BoxFit.cover,
                                                                                     ),
-                                                                                  ),
-                                                                                ),
-                                                                                GradientText(
-                                                                                  treasurerNameItem.displayName,
-                                                                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                        fontFamily: 'Readex Pro',
-                                                                                        color: FlutterFlowTheme.of(context).info,
-                                                                                      ),
-                                                                                  colors: [
-                                                                                    FlutterFlowTheme.of(context).primary,
-                                                                                    FlutterFlowTheme.of(context).secondary
                                                                                   ],
-                                                                                  gradientDirection: GradientDirection.ltr,
-                                                                                  gradientType: GradientType.linear,
+                                                                                ),
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    GradientText(
+                                                                                      treasurerNameItem.displayName,
+                                                                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                                                            fontFamily: 'Readex Pro',
+                                                                                            color: FlutterFlowTheme.of(context).info,
+                                                                                          ),
+                                                                                      colors: [
+                                                                                        FlutterFlowTheme.of(context).primary,
+                                                                                        FlutterFlowTheme.of(context).secondary
+                                                                                      ],
+                                                                                      gradientDirection: GradientDirection.ltr,
+                                                                                      gradientType: GradientType.linear,
+                                                                                    ),
+                                                                                  ],
                                                                                 ),
                                                                               ],
                                                                             ),
@@ -2021,56 +2260,104 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update({
-                                                                                    ...createUsersRecordData(
-                                                                                      audiVote: true,
-                                                                                    ),
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'auditorDataList': FieldValue.arrayUnion([
-                                                                                          getRepsInfoFirestoreData(
-                                                                                            updateRepsInfoStruct(
-                                                                                              RepsInfoStruct(
-                                                                                                photoUrl: listViewUsersRecord.photoUrl,
-                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                  var confirmDialogResponse = await showDialog<bool>(
+                                                                                        context: context,
+                                                                                        builder: (alertDialogContext) {
+                                                                                          return AlertDialog(
+                                                                                            title: Text('Are you sure you want to vote?'),
+                                                                                            content: Text(listViewUsersRecord.displayName),
+                                                                                            actions: [
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                                                child: Text('Cancel'),
                                                                                               ),
-                                                                                              clearUnsetFields: false,
-                                                                                            ),
-                                                                                            true,
-                                                                                          )
-                                                                                        ]),
-                                                                                      },
-                                                                                    ),
-                                                                                  });
-                                                                                  setState(() {});
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                                                child: Text('Confirm'),
+                                                                                              ),
+                                                                                            ],
+                                                                                          );
+                                                                                        },
+                                                                                      ) ??
+                                                                                      false;
+                                                                                  if (confirmDialogResponse) {
+                                                                                    await currentUserReference!.update({
+                                                                                      ...createUsersRecordData(
+                                                                                        audiVote: true,
+                                                                                      ),
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'auditorDataList': FieldValue.arrayUnion([
+                                                                                            getRepsInfoFirestoreData(
+                                                                                              updateRepsInfoStruct(
+                                                                                                RepsInfoStruct(
+                                                                                                  photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                  displayName: listViewUsersRecord.displayName,
+                                                                                                ),
+                                                                                                clearUnsetFields: false,
+                                                                                              ),
+                                                                                              true,
+                                                                                            )
+                                                                                          ]),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                    setState(() {});
 
-                                                                                  await listViewUsersRecord.reference.update({
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                    await listViewUsersRecord.reference.update({
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'voteCount': FieldValue.increment(1),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                  } else {
+                                                                                    if (Navigator.of(context).canPop()) {
+                                                                                      context.pop();
+                                                                                    }
+                                                                                    context.pushNamed(
+                                                                                      'studentVoting',
+                                                                                      extra: <String, dynamic>{
+                                                                                        kTransitionInfoKey: TransitionInfo(
+                                                                                          hasTransition: true,
+                                                                                          transitionType: PageTransitionType.fade,
+                                                                                          duration: Duration(milliseconds: 0),
+                                                                                        ),
                                                                                       },
-                                                                                    ),
-                                                                                  });
+                                                                                    );
+                                                                                  }
                                                                                 }
                                                                               },
                                                                               child: Column(
                                                                                 mainAxisSize: MainAxisSize.max,
                                                                                 children: [
-                                                                                  ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(8.0),
-                                                                                    child: Image.network(
-                                                                                      valueOrDefault<String>(
-                                                                                        listViewUsersRecord.photoUrl,
-                                                                                        'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                        child: Image.network(
+                                                                                          valueOrDefault<String>(
+                                                                                            listViewUsersRecord.photoUrl,
+                                                                                            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                          ),
+                                                                                          width: 100.0,
+                                                                                          height: 100.0,
+                                                                                          fit: BoxFit.cover,
+                                                                                        ),
                                                                                       ),
-                                                                                      width: 100.0,
-                                                                                      height: 100.0,
-                                                                                      fit: BoxFit.cover,
-                                                                                    ),
+                                                                                    ],
                                                                                   ),
-                                                                                  AutoSizeText(
-                                                                                    listViewUsersRecord.displayName,
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      AutoSizeText(
+                                                                                        listViewUsersRecord.displayName,
+                                                                                        style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                      ),
+                                                                                    ],
                                                                                   ),
                                                                                 ],
                                                                               ),
@@ -2102,7 +2389,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     return Row(
                                                                       mainAxisSize:
                                                                           MainAxisSize
-                                                                              .min,
+                                                                              .max,
                                                                       mainAxisAlignment:
                                                                           MainAxisAlignment
                                                                               .center,
@@ -2124,34 +2411,45 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
-                                                                                Align(
-                                                                                  alignment: AlignmentDirectional(0.00, 0.00),
-                                                                                  child: ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(8.0),
-                                                                                    child: Image.network(
-                                                                                      valueOrDefault<String>(
-                                                                                        auditorNameItem.photoUrl,
-                                                                                        'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    Align(
+                                                                                      alignment: AlignmentDirectional(0.00, 0.00),
+                                                                                      child: ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                        child: Image.network(
+                                                                                          valueOrDefault<String>(
+                                                                                            auditorNameItem.photoUrl,
+                                                                                            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                          ),
+                                                                                          width: 100.0,
+                                                                                          height: 100.0,
+                                                                                          fit: BoxFit.cover,
+                                                                                        ),
                                                                                       ),
-                                                                                      width: 100.0,
-                                                                                      height: 100.0,
-                                                                                      fit: BoxFit.cover,
                                                                                     ),
-                                                                                  ),
-                                                                                ),
-                                                                                GradientText(
-                                                                                  auditorNameItem.displayName,
-                                                                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                        fontFamily: 'Readex Pro',
-                                                                                        color: FlutterFlowTheme.of(context).info,
-                                                                                        fontSize: 14.0,
-                                                                                      ),
-                                                                                  colors: [
-                                                                                    FlutterFlowTheme.of(context).primary,
-                                                                                    FlutterFlowTheme.of(context).secondary
                                                                                   ],
-                                                                                  gradientDirection: GradientDirection.ltr,
-                                                                                  gradientType: GradientType.linear,
+                                                                                ),
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  children: [
+                                                                                    GradientText(
+                                                                                      auditorNameItem.displayName,
+                                                                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                                                            fontFamily: 'Readex Pro',
+                                                                                            color: FlutterFlowTheme.of(context).info,
+                                                                                            fontSize: 14.0,
+                                                                                          ),
+                                                                                      colors: [
+                                                                                        FlutterFlowTheme.of(context).primary,
+                                                                                        FlutterFlowTheme.of(context).secondary
+                                                                                      ],
+                                                                                      gradientDirection: GradientDirection.ltr,
+                                                                                      gradientType: GradientType.linear,
+                                                                                    ),
+                                                                                  ],
                                                                                 ),
                                                                               ],
                                                                             ),
@@ -2305,56 +2603,104 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update({
-                                                                                    ...createUsersRecordData(
-                                                                                      bmanVote: true,
-                                                                                    ),
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'businessManagerDataList': FieldValue.arrayUnion([
-                                                                                          getRepsInfoFirestoreData(
-                                                                                            updateRepsInfoStruct(
-                                                                                              RepsInfoStruct(
-                                                                                                photoUrl: listViewUsersRecord.photoUrl,
-                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                  var confirmDialogResponse = await showDialog<bool>(
+                                                                                        context: context,
+                                                                                        builder: (alertDialogContext) {
+                                                                                          return AlertDialog(
+                                                                                            title: Text('Are you sure you want to vote?'),
+                                                                                            content: Text(listViewUsersRecord.displayName),
+                                                                                            actions: [
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                                                child: Text('Cancel'),
                                                                                               ),
-                                                                                              clearUnsetFields: false,
-                                                                                            ),
-                                                                                            true,
-                                                                                          )
-                                                                                        ]),
-                                                                                      },
-                                                                                    ),
-                                                                                  });
-                                                                                  setState(() {});
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                                                child: Text('Confirm'),
+                                                                                              ),
+                                                                                            ],
+                                                                                          );
+                                                                                        },
+                                                                                      ) ??
+                                                                                      false;
+                                                                                  if (confirmDialogResponse) {
+                                                                                    await currentUserReference!.update({
+                                                                                      ...createUsersRecordData(
+                                                                                        bmanVote: true,
+                                                                                      ),
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'businessManagerDataList': FieldValue.arrayUnion([
+                                                                                            getRepsInfoFirestoreData(
+                                                                                              updateRepsInfoStruct(
+                                                                                                RepsInfoStruct(
+                                                                                                  photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                  displayName: listViewUsersRecord.displayName,
+                                                                                                ),
+                                                                                                clearUnsetFields: false,
+                                                                                              ),
+                                                                                              true,
+                                                                                            )
+                                                                                          ]),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                    setState(() {});
 
-                                                                                  await listViewUsersRecord.reference.update({
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                    await listViewUsersRecord.reference.update({
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'voteCount': FieldValue.increment(1),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                  } else {
+                                                                                    if (Navigator.of(context).canPop()) {
+                                                                                      context.pop();
+                                                                                    }
+                                                                                    context.pushNamed(
+                                                                                      'studentVoting',
+                                                                                      extra: <String, dynamic>{
+                                                                                        kTransitionInfoKey: TransitionInfo(
+                                                                                          hasTransition: true,
+                                                                                          transitionType: PageTransitionType.fade,
+                                                                                          duration: Duration(milliseconds: 0),
+                                                                                        ),
                                                                                       },
-                                                                                    ),
-                                                                                  });
+                                                                                    );
+                                                                                  }
                                                                                 }
                                                                               },
                                                                               child: Column(
                                                                                 mainAxisSize: MainAxisSize.max,
                                                                                 children: [
-                                                                                  ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(8.0),
-                                                                                    child: Image.network(
-                                                                                      valueOrDefault<String>(
-                                                                                        listViewUsersRecord.photoUrl,
-                                                                                        'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                        child: Image.network(
+                                                                                          valueOrDefault<String>(
+                                                                                            listViewUsersRecord.photoUrl,
+                                                                                            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                          ),
+                                                                                          width: 100.0,
+                                                                                          height: 100.0,
+                                                                                          fit: BoxFit.cover,
+                                                                                        ),
                                                                                       ),
-                                                                                      width: 100.0,
-                                                                                      height: 100.0,
-                                                                                      fit: BoxFit.cover,
-                                                                                    ),
+                                                                                    ],
                                                                                   ),
-                                                                                  AutoSizeText(
-                                                                                    listViewUsersRecord.displayName,
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      AutoSizeText(
+                                                                                        listViewUsersRecord.displayName,
+                                                                                        style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                      ),
+                                                                                    ],
                                                                                   ),
                                                                                 ],
                                                                               ),
@@ -2386,7 +2732,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     return Row(
                                                                       mainAxisSize:
                                                                           MainAxisSize
-                                                                              .min,
+                                                                              .max,
                                                                       mainAxisAlignment:
                                                                           MainAxisAlignment
                                                                               .center,
@@ -2408,30 +2754,42 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
-                                                                                ClipRRect(
-                                                                                  borderRadius: BorderRadius.circular(8.0),
-                                                                                  child: Image.network(
-                                                                                    valueOrDefault<String>(
-                                                                                      businessManagerItem.photoUrl,
-                                                                                      'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
-                                                                                    ),
-                                                                                    width: 100.0,
-                                                                                    height: 100.0,
-                                                                                    fit: BoxFit.cover,
-                                                                                  ),
-                                                                                ),
-                                                                                GradientText(
-                                                                                  businessManagerItem.displayName,
-                                                                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                        fontFamily: 'Readex Pro',
-                                                                                        color: FlutterFlowTheme.of(context).info,
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    ClipRRect(
+                                                                                      borderRadius: BorderRadius.circular(8.0),
+                                                                                      child: Image.network(
+                                                                                        valueOrDefault<String>(
+                                                                                          businessManagerItem.photoUrl,
+                                                                                          'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                        ),
+                                                                                        width: 100.0,
+                                                                                        height: 100.0,
+                                                                                        fit: BoxFit.cover,
                                                                                       ),
-                                                                                  colors: [
-                                                                                    FlutterFlowTheme.of(context).primary,
-                                                                                    FlutterFlowTheme.of(context).secondary
+                                                                                    ),
                                                                                   ],
-                                                                                  gradientDirection: GradientDirection.ltr,
-                                                                                  gradientType: GradientType.linear,
+                                                                                ),
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    GradientText(
+                                                                                      businessManagerItem.displayName,
+                                                                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                                                            fontFamily: 'Readex Pro',
+                                                                                            color: FlutterFlowTheme.of(context).info,
+                                                                                          ),
+                                                                                      colors: [
+                                                                                        FlutterFlowTheme.of(context).primary,
+                                                                                        FlutterFlowTheme.of(context).secondary
+                                                                                      ],
+                                                                                      gradientDirection: GradientDirection.ltr,
+                                                                                      gradientType: GradientType.linear,
+                                                                                    ),
+                                                                                  ],
                                                                                 ),
                                                                               ],
                                                                             ),
@@ -2588,56 +2946,103 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                     },
                                                                                   );
                                                                                 } else {
-                                                                                  await currentUserReference!.update({
-                                                                                    ...createUsersRecordData(
-                                                                                      pioVote: true,
-                                                                                    ),
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'pioDataList': FieldValue.arrayUnion([
-                                                                                          getRepsInfoFirestoreData(
-                                                                                            updateRepsInfoStruct(
-                                                                                              RepsInfoStruct(
-                                                                                                photoUrl: listViewUsersRecord.photoUrl,
-                                                                                                displayName: listViewUsersRecord.displayName,
+                                                                                  var confirmDialogResponse = await showDialog<bool>(
+                                                                                        context: context,
+                                                                                        builder: (alertDialogContext) {
+                                                                                          return AlertDialog(
+                                                                                            title: Text('Are you sure you want to vote?'),
+                                                                                            content: Text(listViewUsersRecord.displayName),
+                                                                                            actions: [
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                                                child: Text('Cancel'),
                                                                                               ),
-                                                                                              clearUnsetFields: false,
-                                                                                            ),
-                                                                                            true,
-                                                                                          )
-                                                                                        ]),
-                                                                                      },
-                                                                                    ),
-                                                                                  });
-                                                                                  setState(() {});
+                                                                                              TextButton(
+                                                                                                onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                                                child: Text('Confirm'),
+                                                                                              ),
+                                                                                            ],
+                                                                                          );
+                                                                                        },
+                                                                                      ) ??
+                                                                                      false;
+                                                                                  if (confirmDialogResponse) {
+                                                                                    await currentUserReference!.update({
+                                                                                      ...createUsersRecordData(
+                                                                                        pioVote: true,
+                                                                                      ),
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'pioDataList': FieldValue.arrayUnion([
+                                                                                            getRepsInfoFirestoreData(
+                                                                                              updateRepsInfoStruct(
+                                                                                                RepsInfoStruct(
+                                                                                                  photoUrl: listViewUsersRecord.photoUrl,
+                                                                                                  displayName: listViewUsersRecord.displayName,
+                                                                                                ),
+                                                                                                clearUnsetFields: false,
+                                                                                              ),
+                                                                                              true,
+                                                                                            )
+                                                                                          ]),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                    setState(() {});
 
-                                                                                  await listViewUsersRecord.reference.update({
-                                                                                    ...mapToFirestore(
-                                                                                      {
-                                                                                        'voteCount': FieldValue.increment(1),
+                                                                                    await listViewUsersRecord.reference.update({
+                                                                                      ...mapToFirestore(
+                                                                                        {
+                                                                                          'voteCount': FieldValue.increment(1),
+                                                                                        },
+                                                                                      ),
+                                                                                    });
+                                                                                  } else {
+                                                                                    if (Navigator.of(context).canPop()) {
+                                                                                      context.pop();
+                                                                                    }
+                                                                                    context.pushNamed(
+                                                                                      'studentVoting',
+                                                                                      extra: <String, dynamic>{
+                                                                                        kTransitionInfoKey: TransitionInfo(
+                                                                                          hasTransition: true,
+                                                                                          transitionType: PageTransitionType.fade,
+                                                                                          duration: Duration(milliseconds: 0),
+                                                                                        ),
                                                                                       },
-                                                                                    ),
-                                                                                  });
+                                                                                    );
+                                                                                  }
                                                                                 }
                                                                               },
                                                                               child: Column(
                                                                                 mainAxisSize: MainAxisSize.max,
                                                                                 children: [
-                                                                                  ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(8.0),
-                                                                                    child: Image.network(
-                                                                                      valueOrDefault<String>(
-                                                                                        listViewUsersRecord.photoUrl,
-                                                                                        'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                        child: Image.network(
+                                                                                          valueOrDefault<String>(
+                                                                                            listViewUsersRecord.photoUrl,
+                                                                                            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                          ),
+                                                                                          width: 100.0,
+                                                                                          height: 100.0,
+                                                                                          fit: BoxFit.cover,
+                                                                                        ),
                                                                                       ),
-                                                                                      width: 100.0,
-                                                                                      height: 100.0,
-                                                                                      fit: BoxFit.cover,
-                                                                                    ),
+                                                                                    ],
                                                                                   ),
-                                                                                  AutoSizeText(
-                                                                                    listViewUsersRecord.displayName,
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    children: [
+                                                                                      AutoSizeText(
+                                                                                        listViewUsersRecord.displayName,
+                                                                                        style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                      ),
+                                                                                    ],
                                                                                   ),
                                                                                 ],
                                                                               ),
@@ -2669,7 +3074,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                     return Row(
                                                                       mainAxisSize:
                                                                           MainAxisSize
-                                                                              .min,
+                                                                              .max,
                                                                       mainAxisAlignment:
                                                                           MainAxisAlignment
                                                                               .center,
@@ -2691,30 +3096,41 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                               mainAxisSize: MainAxisSize.min,
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
-                                                                                ClipRRect(
-                                                                                  borderRadius: BorderRadius.circular(8.0),
-                                                                                  child: Image.network(
-                                                                                    valueOrDefault<String>(
-                                                                                      pioNameItem.photoUrl,
-                                                                                      'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
-                                                                                    ),
-                                                                                    width: 100.0,
-                                                                                    height: 100.0,
-                                                                                    fit: BoxFit.cover,
-                                                                                  ),
-                                                                                ),
-                                                                                GradientText(
-                                                                                  pioNameItem.displayName,
-                                                                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                        fontFamily: 'Readex Pro',
-                                                                                        color: FlutterFlowTheme.of(context).info,
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    ClipRRect(
+                                                                                      borderRadius: BorderRadius.circular(8.0),
+                                                                                      child: Image.network(
+                                                                                        valueOrDefault<String>(
+                                                                                          pioNameItem.photoUrl,
+                                                                                          'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                        ),
+                                                                                        width: 100.0,
+                                                                                        height: 100.0,
+                                                                                        fit: BoxFit.cover,
                                                                                       ),
-                                                                                  colors: [
-                                                                                    FlutterFlowTheme.of(context).primary,
-                                                                                    FlutterFlowTheme.of(context).secondary
+                                                                                    ),
                                                                                   ],
-                                                                                  gradientDirection: GradientDirection.ltr,
-                                                                                  gradientType: GradientType.linear,
+                                                                                ),
+                                                                                Row(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  children: [
+                                                                                    GradientText(
+                                                                                      pioNameItem.displayName,
+                                                                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                                                            fontFamily: 'Readex Pro',
+                                                                                            color: FlutterFlowTheme.of(context).info,
+                                                                                          ),
+                                                                                      colors: [
+                                                                                        FlutterFlowTheme.of(context).primary,
+                                                                                        FlutterFlowTheme.of(context).secondary
+                                                                                      ],
+                                                                                      gradientDirection: GradientDirection.ltr,
+                                                                                      gradientType: GradientType.linear,
+                                                                                    ),
+                                                                                  ],
                                                                                 ),
                                                                               ],
                                                                             ),
@@ -2885,57 +3301,105 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                                       ),
                                                                                     );
                                                                                   } else {
-                                                                                    await currentUserReference!.update({
-                                                                                      ...createUsersRecordData(
-                                                                                        repVote: true,
-                                                                                      ),
-                                                                                      ...mapToFirestore(
-                                                                                        {
-                                                                                          'representativesList': FieldValue.arrayUnion([
-                                                                                            getRepsInfoFirestoreData(
-                                                                                              createRepsInfoStruct(
-                                                                                                photoUrl: listViewMainUsersRecord.photoUrl,
-                                                                                                displayName: listViewMainUsersRecord.displayName,
-                                                                                                clearUnsetFields: false,
-                                                                                              ),
-                                                                                              true,
-                                                                                            )
-                                                                                          ]),
-                                                                                        },
-                                                                                      ),
-                                                                                    });
+                                                                                    var confirmDialogResponse = await showDialog<bool>(
+                                                                                          context: context,
+                                                                                          builder: (alertDialogContext) {
+                                                                                            return AlertDialog(
+                                                                                              title: Text('Are you sure you want to vote?'),
+                                                                                              content: Text(listViewMainUsersRecord.displayName),
+                                                                                              actions: [
+                                                                                                TextButton(
+                                                                                                  onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                                                  child: Text('Cancel'),
+                                                                                                ),
+                                                                                                TextButton(
+                                                                                                  onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                                                  child: Text('Confirm'),
+                                                                                                ),
+                                                                                              ],
+                                                                                            );
+                                                                                          },
+                                                                                        ) ??
+                                                                                        false;
+                                                                                    if (confirmDialogResponse) {
+                                                                                      await currentUserReference!.update({
+                                                                                        ...createUsersRecordData(
+                                                                                          repVote: true,
+                                                                                        ),
+                                                                                        ...mapToFirestore(
+                                                                                          {
+                                                                                            'representativesList': FieldValue.arrayUnion([
+                                                                                              getRepsInfoFirestoreData(
+                                                                                                createRepsInfoStruct(
+                                                                                                  photoUrl: listViewMainUsersRecord.photoUrl,
+                                                                                                  displayName: listViewMainUsersRecord.displayName,
+                                                                                                  clearUnsetFields: false,
+                                                                                                ),
+                                                                                                true,
+                                                                                              )
+                                                                                            ]),
+                                                                                          },
+                                                                                        ),
+                                                                                      });
 
-                                                                                    await listViewMainUsersRecord.reference.update({
-                                                                                      ...mapToFirestore(
-                                                                                        {
-                                                                                          'voteCount': FieldValue.increment(1),
+                                                                                      await listViewMainUsersRecord.reference.update({
+                                                                                        ...mapToFirestore(
+                                                                                          {
+                                                                                            'voteCount': FieldValue.increment(1),
+                                                                                          },
+                                                                                        ),
+                                                                                      });
+                                                                                      setState(() {
+                                                                                        FFAppState().forRepsBoolean = true;
+                                                                                      });
+                                                                                    } else {
+                                                                                      if (Navigator.of(context).canPop()) {
+                                                                                        context.pop();
+                                                                                      }
+                                                                                      context.pushNamed(
+                                                                                        'studentVoting',
+                                                                                        extra: <String, dynamic>{
+                                                                                          kTransitionInfoKey: TransitionInfo(
+                                                                                            hasTransition: true,
+                                                                                            transitionType: PageTransitionType.fade,
+                                                                                            duration: Duration(milliseconds: 0),
+                                                                                          ),
                                                                                         },
-                                                                                      ),
-                                                                                    });
-                                                                                    setState(() {
-                                                                                      FFAppState().forRepsBoolean = true;
-                                                                                    });
+                                                                                      );
+                                                                                    }
                                                                                   }
                                                                                 }
                                                                               },
                                                                               child: Column(
                                                                                 mainAxisSize: MainAxisSize.max,
                                                                                 children: [
-                                                                                  ClipRRect(
-                                                                                    borderRadius: BorderRadius.circular(8.0),
-                                                                                    child: Image.network(
-                                                                                      valueOrDefault<String>(
-                                                                                        listViewMainUsersRecord.photoUrl,
-                                                                                        'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                        child: Image.network(
+                                                                                          valueOrDefault<String>(
+                                                                                            listViewMainUsersRecord.photoUrl,
+                                                                                            'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                          ),
+                                                                                          width: 100.0,
+                                                                                          height: 100.0,
+                                                                                          fit: BoxFit.cover,
+                                                                                        ),
                                                                                       ),
-                                                                                      width: 100.0,
-                                                                                      height: 100.0,
-                                                                                      fit: BoxFit.cover,
-                                                                                    ),
+                                                                                    ],
                                                                                   ),
-                                                                                  AutoSizeText(
-                                                                                    listViewMainUsersRecord.displayName,
-                                                                                    style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                  Row(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    children: [
+                                                                                      AutoSizeText(
+                                                                                        listViewMainUsersRecord.displayName,
+                                                                                        style: FlutterFlowTheme.of(context).bodyMedium,
+                                                                                      ),
+                                                                                    ],
                                                                                   ),
                                                                                 ],
                                                                               ),
@@ -2990,42 +3454,53 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                                         child:
                                                                             Row(
                                                                           mainAxisSize:
-                                                                              MainAxisSize.min,
+                                                                              MainAxisSize.max,
                                                                           mainAxisAlignment:
                                                                               MainAxisAlignment.center,
                                                                           children: [
-                                                                            if (valueOrDefault<bool>(currentUserDocument?.repVote, false) ==
-                                                                                true)
+                                                                            if ((valueOrDefault<bool>(currentUserDocument?.repVote, false) == true) ||
+                                                                                (valueOrDefault<bool>(currentUserDocument?.doneVote, false) == true))
                                                                               Align(
                                                                                 alignment: AlignmentDirectional(0.00, 0.00),
                                                                                 child: Column(
                                                                                   mainAxisSize: MainAxisSize.min,
                                                                                   mainAxisAlignment: MainAxisAlignment.center,
                                                                                   children: [
-                                                                                    ClipRRect(
-                                                                                      borderRadius: BorderRadius.circular(8.0),
-                                                                                      child: Image.network(
-                                                                                        valueOrDefault<String>(
-                                                                                          repsListItem.photoUrl,
-                                                                                          'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
-                                                                                        ),
-                                                                                        width: 100.0,
-                                                                                        height: 100.0,
-                                                                                        fit: BoxFit.cover,
-                                                                                      ),
-                                                                                    ),
-                                                                                    GradientText(
-                                                                                      repsListItem.displayName,
-                                                                                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                                                            fontFamily: 'Readex Pro',
-                                                                                            color: FlutterFlowTheme.of(context).info,
+                                                                                    Row(
+                                                                                      mainAxisSize: MainAxisSize.max,
+                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                      children: [
+                                                                                        ClipRRect(
+                                                                                          borderRadius: BorderRadius.circular(8.0),
+                                                                                          child: Image.network(
+                                                                                            valueOrDefault<String>(
+                                                                                              repsListItem.photoUrl,
+                                                                                              'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
+                                                                                            ),
+                                                                                            width: 100.0,
+                                                                                            height: 100.0,
+                                                                                            fit: BoxFit.cover,
                                                                                           ),
-                                                                                      colors: [
-                                                                                        FlutterFlowTheme.of(context).primary,
-                                                                                        FlutterFlowTheme.of(context).secondary
+                                                                                        ),
                                                                                       ],
-                                                                                      gradientDirection: GradientDirection.ltr,
-                                                                                      gradientType: GradientType.linear,
+                                                                                    ),
+                                                                                    Row(
+                                                                                      mainAxisSize: MainAxisSize.max,
+                                                                                      children: [
+                                                                                        GradientText(
+                                                                                          repsListItem.displayName,
+                                                                                          style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                                                                fontFamily: 'Readex Pro',
+                                                                                                color: FlutterFlowTheme.of(context).info,
+                                                                                              ),
+                                                                                          colors: [
+                                                                                            FlutterFlowTheme.of(context).primary,
+                                                                                            FlutterFlowTheme.of(context).secondary
+                                                                                          ],
+                                                                                          gradientDirection: GradientDirection.ltr,
+                                                                                          gradientType: GradientType.linear,
+                                                                                        ),
+                                                                                      ],
                                                                                     ),
                                                                                   ],
                                                                                 ),

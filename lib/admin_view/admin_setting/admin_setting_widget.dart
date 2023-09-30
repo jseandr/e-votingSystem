@@ -445,7 +445,7 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                               highlightColor: Colors.transparent,
                               onTap: () async {
                                 context.pushNamed(
-                                  'adminUsers',
+                                  'adminStatus',
                                   extra: <String, dynamic>{
                                     kTransitionInfoKey: TransitionInfo(
                                       hasTransition: true,
@@ -470,7 +470,7 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                                         padding: EdgeInsetsDirectional.fromSTEB(
                                             12.0, 0.0, 12.0, 0.0),
                                         child: Icon(
-                                          Icons.manage_accounts,
+                                          Icons.query_stats,
                                           color: Colors.black,
                                           size: 35.0,
                                         ),
@@ -479,7 +479,7 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                                         padding: EdgeInsetsDirectional.fromSTEB(
                                             14.0, 0.0, 0.0, 0.0),
                                         child: Text(
-                                          'Admin Users',
+                                          'Status',
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -605,7 +605,7 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                                           builder: (alertDialogContext) {
                                             return AlertDialog(
                                               content: Text(
-                                                  'VOTING PHASE IS NOW ON'),
+                                                  'VOTING PHASE IS ACTIVE'),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () =>
@@ -618,7 +618,7 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                                           },
                                         );
                                       },
-                                      text: 'On Voting',
+                                      text: 'Voting ON',
                                       options: FFButtonOptions(
                                         height: 40.0,
                                         padding: EdgeInsetsDirectional.fromSTEB(
@@ -654,7 +654,7 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                                           builder: (alertDialogContext) {
                                             return AlertDialog(
                                               content: Text(
-                                                  'VOTING PHASE IS NOW OFF'),
+                                                  'VOTING PHASE IS INACTIVE'),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () =>
@@ -667,7 +667,7 @@ class _AdminSettingWidgetState extends State<AdminSettingWidget> {
                                           },
                                         );
                                       },
-                                      text: 'Off Voting',
+                                      text: 'Voting OFF',
                                       options: FFButtonOptions(
                                         height: 40.0,
                                         padding: EdgeInsetsDirectional.fromSTEB(
