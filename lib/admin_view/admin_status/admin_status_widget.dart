@@ -849,7 +849,7 @@ class _AdminStatusWidgetState extends State<AdminStatusWidget> {
                                             fit: BoxFit.contain,
                                           ),
                                           Text(
-                                            'POLANGUI \nCAMPUS',
+                                            'BU POLANGUI',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(

@@ -37,6 +37,20 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       if (FFAppState().votingPhaseSwitch != true) {
         context.safePop();
+      } else {
+        if (valueOrDefault<bool>(currentUserDocument?.doneVote, false) ==
+            true) {
+          context.goNamed(
+            'studentThankYouForVoting',
+            extra: <String, dynamic>{
+              kTransitionInfoKey: TransitionInfo(
+                hasTransition: true,
+                transitionType: PageTransitionType.fade,
+                duration: Duration(milliseconds: 0),
+              ),
+            },
+          );
+        }
       }
     });
   }
@@ -694,7 +708,7 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                             fit: BoxFit.contain,
                                           ),
                                           Text(
-                                            'POLANGUI \nCAMPUS',
+                                            'BU POLANGUI',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -3691,7 +3705,22 @@ class _StudentVotingWidgetState extends State<StudentVotingWidget> {
                                                           );
 
                                                           context.goNamed(
-                                                              'studentHome');
+                                                            'studentThankYouForVoting',
+                                                            extra: <String,
+                                                                dynamic>{
+                                                              kTransitionInfoKey:
+                                                                  TransitionInfo(
+                                                                hasTransition:
+                                                                    true,
+                                                                transitionType:
+                                                                    PageTransitionType
+                                                                        .fade,
+                                                                duration: Duration(
+                                                                    milliseconds:
+                                                                        0),
+                                                              ),
+                                                            },
+                                                          );
                                                         }
                                                       },
                                                       text: 'Marked as Done',

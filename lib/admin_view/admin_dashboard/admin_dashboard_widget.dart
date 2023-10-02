@@ -849,7 +849,7 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                                             fit: BoxFit.contain,
                                           ),
                                           Text(
-                                            'POLANGUI \nCAMPUS',
+                                            'BU POLANGUI',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(

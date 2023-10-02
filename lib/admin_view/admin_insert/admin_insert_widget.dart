@@ -962,7 +962,7 @@ class _AdminInsertWidgetState extends State<AdminInsertWidget> {
                                             fit: BoxFit.contain,
                                           ),
                                           Text(
-                                            'POLANGUI \nCAMPUS',
+                                            'BU POLANGUI',
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(

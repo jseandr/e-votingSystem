@@ -1,35 +1,48 @@
 import '/auth/firebase_auth/auth_util.dart';
-import '/backend/backend.dart';
-import '/backend/firebase_storage/storage.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import '/flutter_flow/upload_data.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'student_setting_model.dart';
-export 'student_setting_model.dart';
+import 'student_thank_you_for_voting_model.dart';
+export 'student_thank_you_for_voting_model.dart';
 
-class StudentSettingWidget extends StatefulWidget {
-  const StudentSettingWidget({Key? key}) : super(key: key);
+class StudentThankYouForVotingWidget extends StatefulWidget {
+  const StudentThankYouForVotingWidget({Key? key}) : super(key: key);
 
   @override
-  _StudentSettingWidgetState createState() => _StudentSettingWidgetState();
+  _StudentThankYouForVotingWidgetState createState() =>
+      _StudentThankYouForVotingWidgetState();
 }
 
-class _StudentSettingWidgetState extends State<StudentSettingWidget> {
-  late StudentSettingModel _model;
+class _StudentThankYouForVotingWidgetState
+    extends State<StudentThankYouForVotingWidget> {
+  late StudentThankYouForVotingModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    _model = createModel(context, () => StudentSettingModel());
+    _model = createModel(context, () => StudentThankYouForVotingModel());
+
+    // On page load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      if (valueOrDefault<bool>(currentUserDocument?.doneVote, false) == true) {
+        context.goNamed(
+          'studentThankYouForVoting',
+          extra: <String, dynamic>{
+            kTransitionInfoKey: TransitionInfo(
+              hasTransition: true,
+              transitionType: PageTransitionType.fade,
+              duration: Duration(milliseconds: 0),
+            ),
+          },
+        );
+      }
+    });
   }
 
   @override
@@ -236,19 +249,7 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                           hoverColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
                                           onTap: () async {
-                                            context.goNamed(
-                                              'studentHome',
-                                              extra: <String, dynamic>{
-                                                kTransitionInfoKey:
-                                                    TransitionInfo(
-                                                  hasTransition: true,
-                                                  transitionType:
-                                                      PageTransitionType.fade,
-                                                  duration:
-                                                      Duration(milliseconds: 0),
-                                                ),
-                                              },
-                                            );
+                                            context.pushNamed('studentHome');
                                           },
                                           child: Text(
                                             'Home',
@@ -433,23 +434,21 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                if (scaffoldKey.currentState!.isDrawerOpen ||
-                                    scaffoldKey.currentState!.isEndDrawerOpen) {
-                                  Navigator.pop(context);
-                                }
+                                context.pushNamed(
+                                  'studentSetting',
+                                  extra: <String, dynamic>{
+                                    kTransitionInfoKey: TransitionInfo(
+                                      hasTransition: true,
+                                      transitionType: PageTransitionType.fade,
+                                      duration: Duration(milliseconds: 0),
+                                    ),
+                                  },
+                                );
                               },
                               child: Container(
                                 width: double.infinity,
                                 height: 60.0,
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
-                                    )
-                                  ],
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),
+                                decoration: BoxDecoration(),
                                 child: Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 16.0, 0.0),
@@ -462,8 +461,7 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                             12.0, 0.0, 12.0, 0.0),
                                         child: Icon(
                                           Icons.settings_outlined,
-                                          color:
-                                              FlutterFlowTheme.of(context).info,
+                                          color: Colors.black,
                                           size: 35.0,
                                         ),
                                       ),
@@ -476,12 +474,19 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                           hoverColor: Colors.transparent,
                                           highlightColor: Colors.transparent,
                                           onTap: () async {
-                                            if (scaffoldKey.currentState!
-                                                    .isDrawerOpen ||
-                                                scaffoldKey.currentState!
-                                                    .isEndDrawerOpen) {
-                                              Navigator.pop(context);
-                                            }
+                                            context.goNamed(
+                                              'studentSetting',
+                                              extra: <String, dynamic>{
+                                                kTransitionInfoKey:
+                                                    TransitionInfo(
+                                                  hasTransition: true,
+                                                  transitionType:
+                                                      PageTransitionType.fade,
+                                                  duration:
+                                                      Duration(milliseconds: 0),
+                                                ),
+                                              },
+                                            );
                                           },
                                           child: Text(
                                             'Setting',
@@ -489,9 +494,7 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                                 .bodyMedium
                                                 .override(
                                                   fontFamily: 'Readex Pro',
-                                                  color: FlutterFlowTheme.of(
-                                                          context)
-                                                      .info,
+                                                  color: Colors.black,
                                                   fontSize: 26.0,
                                                 ),
                                           ),
@@ -688,303 +691,78 @@ class _StudentSettingWidgetState extends State<StudentSettingWidget> {
                                 thickness: 1.0,
                                 color: Color(0xFF95A1AC),
                               ),
-                              Container(
-                                width: 347.0,
-                                height: 561.0,
-                                decoration: BoxDecoration(),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 100.0,
-                                      height: 100.0,
-                                      decoration: BoxDecoration(),
-                                      child: AuthUserStreamWidget(
-                                        builder: (context) => Container(
-                                          width: 120.0,
-                                          height: 120.0,
-                                          clipBehavior: Clip.antiAlias,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Image.network(
-                                            valueOrDefault<String>(
-                                              currentUserPhoto,
-                                              'https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxwcm9maWxlfGVufDB8fHx8MTY5NTczNjcyN3ww&ixlib=rb-4.0.3&q=80&w=1080',
-                                            ),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        FFButtonWidget(
-                                          onPressed: () async {
-                                            if (currentUserPhoto != '') {
-                                              await FirebaseStorage.instance
-                                                  .refFromURL(currentUserPhoto)
-                                                  .delete();
-                                            }
-                                            final selectedMedia =
-                                                await selectMediaWithSourceBottomSheet(
-                                              context: context,
-                                              allowPhoto: true,
-                                            );
-                                            if (selectedMedia != null &&
-                                                selectedMedia.every((m) =>
-                                                    validateFileFormat(
-                                                        m.storagePath,
-                                                        context))) {
-                                              setState(() => _model
-                                                  .isDataUploading = true);
-                                              var selectedUploadedFiles =
-                                                  <FFUploadedFile>[];
-
-                                              var downloadUrls = <String>[];
-                                              try {
-                                                selectedUploadedFiles =
-                                                    selectedMedia
-                                                        .map((m) =>
-                                                            FFUploadedFile(
-                                                              name: m
-                                                                  .storagePath
-                                                                  .split('/')
-                                                                  .last,
-                                                              bytes: m.bytes,
-                                                              height: m
-                                                                  .dimensions
-                                                                  ?.height,
-                                                              width: m
-                                                                  .dimensions
-                                                                  ?.width,
-                                                              blurHash:
-                                                                  m.blurHash,
-                                                            ))
-                                                        .toList();
-
-                                                downloadUrls =
-                                                    (await Future.wait(
-                                                  selectedMedia.map(
-                                                    (m) async =>
-                                                        await uploadData(
-                                                            m.storagePath,
-                                                            m.bytes),
-                                                  ),
-                                                ))
-                                                        .where((u) => u != null)
-                                                        .map((u) => u!)
-                                                        .toList();
-                                              } finally {
-                                                _model.isDataUploading = false;
-                                              }
-                                              if (selectedUploadedFiles
-                                                          .length ==
-                                                      selectedMedia.length &&
-                                                  downloadUrls.length ==
-                                                      selectedMedia.length) {
-                                                setState(() {
-                                                  _model.uploadedLocalFile =
-                                                      selectedUploadedFiles
-                                                          .first;
-                                                  _model.uploadedFileUrl =
-                                                      downloadUrls.first;
-                                                });
-                                              } else {
-                                                setState(() {});
-                                                return;
-                                              }
-                                            }
-
-                                            await currentUserReference!
-                                                .update(createUsersRecordData(
-                                              photoUrl: _model.uploadedFileUrl,
-                                            ));
-                                          },
-                                          text: 'Upload Image',
-                                          options: FFButtonOptions(
-                                            height: 40.0,
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    24.0, 0.0, 24.0, 0.0),
-                                            iconPadding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    0.0, 0.0, 0.0, 0.0),
-                                            color: FlutterFlowTheme.of(context)
-                                                .primary,
-                                            textStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .titleSmall
-                                                    .override(
-                                                      fontFamily: 'Readex Pro',
-                                                      color: Colors.white,
-                                                    ),
-                                            elevation: 3.0,
-                                            borderSide: BorderSide(
-                                              color: Colors.transparent,
-                                              width: 1.0,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                              Align(
+                                alignment: AlignmentDirectional(0.00, 0.00),
+                                child: Container(
+                                  width: 347.0,
+                                  height: 353.0,
+                                  decoration: BoxDecoration(),
+                                  child: Align(
+                                    alignment: AlignmentDirectional(0.00, 0.00),
+                                    child: Wrap(
+                                      spacing: 0.0,
+                                      runSpacing: 0.0,
+                                      alignment: WrapAlignment.start,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                          WrapCrossAlignment.start,
+                                      direction: Axis.horizontal,
+                                      runAlignment: WrapAlignment.start,
+                                      verticalDirection: VerticalDirection.down,
+                                      clipBehavior: Clip.none,
                                       children: [
                                         Text(
-                                          'NAME:',
+                                          'THANK YOU FOR VOTING!',
+                                          textAlign: TextAlign.justify,
                                           style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
+                                              .titleLarge
                                               .override(
-                                                fontFamily: 'Readex Pro',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .info,
+                                                fontFamily: 'Outfit',
+                                                fontSize: 55.0,
                                               ),
-                                        ),
-                                        Container(
-                                          width: 284.0,
-                                          height: 40.0,
-                                          decoration: BoxDecoration(),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              AuthUserStreamWidget(
-                                                builder: (context) => Text(
-                                                  currentUserDisplayName,
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .info,
-                                                        fontSize: 18.0,
-                                                      ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
                                         ),
                                       ],
                                     ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'EMAIL:',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .info,
-                                              ),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    0.0, 80.0, 0.0, 0.0),
+                                child: FFButtonWidget(
+                                  onPressed: () async {
+                                    context.goNamed(
+                                      'studentHome',
+                                      extra: <String, dynamic>{
+                                        kTransitionInfoKey: TransitionInfo(
+                                          hasTransition: true,
+                                          transitionType:
+                                              PageTransitionType.fade,
+                                          duration: Duration(milliseconds: 0),
                                         ),
-                                        Container(
-                                          width: 284.0,
-                                          height: 40.0,
-                                          decoration: BoxDecoration(),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                currentUserEmail,
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
-                                                      fontFamily: 'Readex Pro',
-                                                      color:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .info,
-                                                      fontSize: 12.0,
-                                                    ),
-                                              ),
-                                            ],
-                                          ),
+                                      },
+                                    );
+                                  },
+                                  text: 'Go to Homepage',
+                                  options: FFButtonOptions(
+                                    height: 40.0,
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        24.0, 0.0, 24.0, 0.0),
+                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    textStyle: FlutterFlowTheme.of(context)
+                                        .titleSmall
+                                        .override(
+                                          fontFamily: 'Readex Pro',
+                                          color: Colors.white,
                                         ),
-                                      ],
+                                    elevation: 3.0,
+                                    borderSide: BorderSide(
+                                      color: Colors.transparent,
+                                      width: 1.0,
                                     ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'ID:',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                fontFamily: 'Readex Pro',
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .info,
-                                              ),
-                                        ),
-                                        Container(
-                                          width: 284.0,
-                                          height: 40.0,
-                                          decoration: BoxDecoration(),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              AuthUserStreamWidget(
-                                                builder: (context) =>
-                                                    AutoSizeText(
-                                                  valueOrDefault(
-                                                      currentUserDocument
-                                                          ?.studentId,
-                                                      ''),
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .info,
-                                                        fontSize: 18.0,
-                                                      ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ]
-                                      .divide(SizedBox(height: 30.0))
-                                      .around(SizedBox(height: 30.0)),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
                                 ),
                               ),
                             ],

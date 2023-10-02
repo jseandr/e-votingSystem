@@ -148,6 +148,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: 'adminDashboard',
           path: '/adminDashboard',
           builder: (context, params) => AdminDashboardWidget(),
+        ),
+        FFRoute(
+          name: 'studentThankYouForVoting',
+          path: '/studentThankYouForVoting',
+          builder: (context, params) => StudentThankYouForVotingWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
